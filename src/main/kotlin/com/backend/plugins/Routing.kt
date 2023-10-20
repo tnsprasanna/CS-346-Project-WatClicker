@@ -5,6 +5,7 @@ import com.backend.authenticate
 import com.backend.*
 import com.backend.data.quiz.QuizDataSource
 import com.backend.data.user.UserDataSource
+import com.backend.routes.*
 import com.backend.data.questions.QuestionDataSource
 import com.backend.routes.getSecretInfo
 import com.backend.security.hashing.HashingService
@@ -31,6 +32,10 @@ fun Application.configureRouting(
         signUp(userDataSource, hashingService)
         authenticate()
         getSecretInfo()
+        getClassSections()
+        getUsers(userDataSource)
+        getStudents(userDataSource)
+        getTeachers(userDataSource)
         addQuestion(questionDataSource, hashingService)
         createQuiz(quizDataSource)
         getQuiz(quizDataSource)
