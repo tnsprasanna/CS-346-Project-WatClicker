@@ -19,6 +19,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import com.backend.data.lecture.LectureDataSource
 
 fun Application.configureRouting(
     userDataSource: UserDataSource,
@@ -26,7 +27,8 @@ fun Application.configureRouting(
     quizDataSource: QuizDataSource,
     hashingService: HashingService,
     tokenService: TokenService,
-    tokenConfig: TokenConfig
+    tokenConfig: TokenConfig,
+    lectureDataSource: LectureDataSource,
 ) {
     routing {
         signIn(userDataSource, hashingService, tokenService, tokenConfig)
@@ -44,6 +46,8 @@ fun Application.configureRouting(
         getQuiz(quizDataSource)
         changeState(quizDataSource)
         deleteQuiz(quizDataSource)
+        createLecture(lectureDataSource)
+
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")
