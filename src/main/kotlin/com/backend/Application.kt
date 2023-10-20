@@ -1,6 +1,7 @@
 package com.backend
 
 import User
+import com.backend.data.questions.MongoQuestionDataSource
 import com.backend.data.quiz.MongoQuizDataSource
 import com.backend.data.user.MongoUserDataSource
 import com.backend.plugins.*
@@ -29,8 +30,7 @@ fun Application.module() {
 
     val userDataSource = MongoUserDataSource(db);
     val quizDataSource = MongoQuizDataSource(db);
-    val questionDataSource = MongoQuestionDataSource(db)
-    val quizDataSource = MongoQuizDataSource(db);
+    val questionDataSource = MongoQuestionDataSource(db);
     val tokenService = JwtTokenService()
     val tokenConfig = TokenConfig(
         issuer = environment.config.property("jwt.issuer").getString(),
@@ -43,8 +43,6 @@ fun Application.module() {
     configureSerialization()
     configureMonitoring()
     configureSecurity(tokenConfig)
-    configureRouting(userDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
-    configureRouting(userDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
-    configureRouting(userDataSource, questionDataSource, hashingService, tokenService, tokenConfig)
+    configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
 }
 
