@@ -16,6 +16,8 @@ import com.backend.security.token.TokenService
 import com.backend.routes.signIn
 import com.backend.routes.signUp
 import com.backend.routes.addQuestion
+import com.backend.routes.getQuestion
+import com.backend.routes.deleteQuestion
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -40,6 +42,8 @@ fun Application.configureRouting(
         getTeachers(userDataSource)
         addQuestion(questionDataSource, hashingService)
         createQuiz(quizDataSource)
+        getQuestion(questionDataSource, hashingService)
+        deleteQuestion(questionDataSource, hashingService)
         getQuiz(quizDataSource)
         changeState(quizDataSource)
         deleteQuiz(quizDataSource)

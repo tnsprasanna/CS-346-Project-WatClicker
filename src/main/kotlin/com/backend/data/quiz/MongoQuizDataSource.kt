@@ -1,16 +1,10 @@
 package com.backend.data.quiz
 
 import Quiz
-import User
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.eq
-import User
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import org.bson.types.ObjectId
-import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.coroutine.updateOne
-import org.litote.kmongo.eq
 
 class MongoQuizDataSource(
     db: CoroutineDatabase
