@@ -3,7 +3,7 @@ package com.backend.data.quiz
 import Quiz
 
 interface QuizDataSource {
-        suspend fun getQuiz(quizId: String): Quiz?
+        suspend fun getQuestions(quizId: String): Quiz?
 
         suspend fun changeState(quizId: String, newState: String): String
 

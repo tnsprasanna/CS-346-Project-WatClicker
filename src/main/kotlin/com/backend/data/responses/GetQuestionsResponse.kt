@@ -1,9 +1,8 @@
 package com.backend.data.responses
 
-import Quiz
 import kotlinx.serialization.Serializable
 
 @Serializable
-class GetQuizResponse (
+class GetQuestionsResponse (
     val questions: Array<String>
 )

@@ -25,7 +25,7 @@ fun Application.configureRouting(
         authenticate()
         getSecretInfo()
         createQuiz(quizDataSource)
-        getQuiz(quizDataSource)
+        getQuestions(quizDataSource)
         changeState(quizDataSource)
         deleteQuiz(quizDataSource)
 

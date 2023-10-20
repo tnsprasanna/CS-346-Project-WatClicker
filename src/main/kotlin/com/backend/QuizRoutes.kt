@@ -5,11 +5,11 @@ import com.backend.data.Constants
 import com.backend.data.quiz.QuizDataSource
 import com.backend.data.requests.ChangeStateRequest
 import com.backend.data.requests.DeleteQuizRequest
-import com.backend.data.requests.GetQuizRequest
+import com.backend.data.requests.GetQuestionsRequest
 import com.backend.data.requests.QuizRequest
 import com.backend.data.responses.ChangeStateResponse
 import com.backend.data.responses.DeleteQuizResponse
-import com.backend.data.responses.GetQuizResponse
+import com.backend.data.responses.GetQuestionsResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -48,14 +48,14 @@ fun Route.createQuiz(quizDataSource: QuizDataSource) {
     }
 }
 
-fun Route.getQuiz(quizDataSource: QuizDataSource) { //maybe getQuestions
-    get("getQuiz") {
-        val request = kotlin.runCatching { call.receiveNullable<GetQuizRequest>() }.getOrNull() ?: kotlin.run {
+fun Route.getQuestions(quizDataSource: QuizDataSource) { //maybe getQuestions
+    get("getQuestions") {
+        val request = kotlin.runCatching { call.receiveNullable<GetQuestionsRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@get
         }
 
-        val quiz = quizDataSource.getQuiz(request.quizId)
+        val quiz = quizDataSource.getQuestions(request.quizId)
 
         if (quiz != null) {
             if (quiz.state == Constants.CLOSED || quiz.state == Constants.HIDDEN) {
@@ -66,7 +66,7 @@ fun Route.getQuiz(quizDataSource: QuizDataSource) { //maybe getQuestions
         }
 
         if (quiz != null) {
-            call.respond(HttpStatusCode.OK, GetQuizResponse(quiz.questions))
+            call.respond(HttpStatusCode.OK, GetQuestionsResponse(quiz.questions))
         }
     }
 }
@@ -93,7 +93,7 @@ fun Route.changeState(quizDataSource: QuizDataSource) {
 
             val quiz = quizDataSource.deleteQuiz(request.quizId)
 
-            call.respond(HttpStatusCode.OK, DeleteQuizResponse("Deletion is successful"))
+            call.respond(HttpStatusCode.OK, DeleteQuizResponse("Deletion was successful!"))
 
         }
     }
