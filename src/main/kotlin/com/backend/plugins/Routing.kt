@@ -1,5 +1,8 @@
 package com.backend.plugins
 
+import com.backend.*
+import com.backend.data.quiz.QuizDataSource
+import com.backend.routes.authenticate
 import com.backend.data.user.UserDataSource
 import com.backend.routes.*
 import com.backend.data.questions.QuestionDataSource
@@ -20,6 +23,7 @@ import io.ktor.server.routing.*
 fun Application.configureRouting(
     userDataSource: UserDataSource,
     questionDataSource: QuestionDataSource,
+    quizDataSource: QuizDataSource,
     hashingService: HashingService,
     tokenService: TokenService,
     tokenConfig: TokenConfig
@@ -29,13 +33,17 @@ fun Application.configureRouting(
         signUp(userDataSource, hashingService)
         authenticate()
         getSecretInfo()
-        addQuestion(questionDataSource, hashingService)
-        getQuestion(questionDataSource, hashingService)
-        deleteQuestion(questionDataSource, hashingService)
         getClassSections()
         getUsers(userDataSource)
         getStudents(userDataSource)
         getTeachers(userDataSource)
+        addQuestion(questionDataSource, hashingService)
+        createQuiz(quizDataSource, questionDataSource)
+        getQuestion(questionDataSource, hashingService)
+        deleteQuestion(questionDataSource, hashingService)
+        getQuiz(quizDataSource)
+        changeState(quizDataSource)
+        deleteQuiz(quizDataSource)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")

@@ -30,11 +30,11 @@ class MongoUserDataSource(
     }
 
     override suspend fun getTeachers(): List<User> {
-        return users.find(User::role eq Constants.teacher_role).toList();
+        return users.find(User::role eq Constants.TEACHER_ROLE).toList();
     }
 
     override suspend fun getStudents(): List<User> {
-        return users.find(User::role eq Constants.student_role).toList();
+        return users.find(User::role eq Constants.STUDENT_ROLE).toList();
     }
 
 

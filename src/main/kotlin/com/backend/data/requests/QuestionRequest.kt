@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class QuestionRequest (
     val question: String,
-    val options: List<String>,
-    val responses: List<Int>,
+    val options: Array<String>,
+    val responses: Array<Int>,
     val answer: Int,
 )
