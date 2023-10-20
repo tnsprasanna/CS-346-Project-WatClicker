@@ -25,6 +25,9 @@ fun Application.configureRouting(
         authenticate()
         getSecretInfo()
         createQuiz(quizDataSource)
+        getQuiz(quizDataSource)
+        changeState(quizDataSource)
+        deleteQuiz(quizDataSource)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")
