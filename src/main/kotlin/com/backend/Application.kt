@@ -1,6 +1,7 @@
 package com.backend
 
 import User
+import com.backend.data.lecture.MongoLectureDataSource
 import com.backend.data.quiz.MongoQuizDataSource
 import com.backend.data.user.MongoUserDataSource
 import com.backend.plugins.*
@@ -26,6 +27,7 @@ fun Application.module() {
         connectionString = "mongodb+srv://$mongoUserName:$mongoPWD@cluster0.3mqtfy8.mongodb.net/$mongoDBName?retryWrites=true&w=majority"
     ).coroutine
         .getDatabase(mongoDBName)
+    val lectureDataSource = MongoLectureDataSource(db);
 
     val userDataSource = MongoUserDataSource(db);
     val quizDataSource = MongoQuizDataSource(db);
@@ -41,6 +43,6 @@ fun Application.module() {
     configureSerialization()
     configureMonitoring()
     configureSecurity(tokenConfig)
-    configureRouting(userDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+    configureRouting(userDataSource, lectureDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
 }
 
