@@ -28,7 +28,7 @@ fun Application.configureRouting(
     hashingService: HashingService,
     tokenService: TokenService,
     tokenConfig: TokenConfig,
-    lectureDataSource: LectureDataSource,
+    lectureDataSource: LectureDataSource
 ) {
     routing {
         signIn(userDataSource, hashingService, tokenService, tokenConfig)
