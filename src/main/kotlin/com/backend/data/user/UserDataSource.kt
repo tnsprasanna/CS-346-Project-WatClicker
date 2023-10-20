@@ -7,7 +7,17 @@ interface UserDataSource {
 
     suspend fun insertUser(user: User): Boolean
 
+    suspend fun getUsers(): List<User>
+
+    suspend fun getTeachers(): List<User>
+
+    suspend fun getStudents(): List<User>
+
+
+
     // Get User by ID
 
     // Update User
+
+    // Delete User
 }

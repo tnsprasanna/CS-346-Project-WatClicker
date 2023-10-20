@@ -1,13 +1,10 @@
 package com.backend.plugins
 
-import com.backend.routes.authenticate
 import com.backend.data.user.UserDataSource
-import com.backend.routes.getSecretInfo
+import com.backend.routes.*
 import com.backend.security.hashing.HashingService
 import com.backend.security.token.TokenConfig
 import com.backend.security.token.TokenService
-import com.backend.routes.signIn
-import com.backend.routes.signUp
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -24,6 +21,10 @@ fun Application.configureRouting(
         signUp(userDataSource, hashingService)
         authenticate()
         getSecretInfo()
+        getClassSections()
+        getUsers(userDataSource)
+        getStudents(userDataSource)
+        getTeachers(userDataSource)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")
