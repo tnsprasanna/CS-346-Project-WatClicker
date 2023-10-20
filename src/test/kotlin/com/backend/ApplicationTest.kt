@@ -288,4 +288,250 @@ class ApplicationTest {
             assertEquals("Unable to Sign-In! Password Incorrect.", bodyAsText())
         }
     }
+
+    @Test // Valid
+    fun testGetQuestion1() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "questionId": "653204f2b4133a26845ac5ec"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuestion")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.get(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test // Invalid
+    fun testGetQuestion2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "questionId": "65320484d913da7802f4a427"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuestion")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.get(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.BadRequest, status)
+            assertEquals("selectedq was null", bodyAsText())
+        }
+    }
+
+    @Test // Invalid
+    fun testAddQuestion1() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "question" : "testQ12",
+            "options": ["op1", "op2"],
+            "responses": [0, 0],
+            "answer": 0
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/addQuestion")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test // Valid
+    fun testDeleteQuestion2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "questionId": "65320484d913da7802f4a427"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuestion")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.get(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.BadRequest, status)
+//            assertEquals("deletion successful", bodyAsText())
+        }
+    }
+
+    @Test // Valid
+    fun testCreateQuiz1() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "name": "testq1",
+            "state": "HIDDEN",
+            "questions": ["653204f2b4133a26845ac5ec", "6532050b0095e01223740fff"]
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/createQuiz")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals("Quiz Created!", bodyAsText())
+        }
+    }
+
+    @Test // Invalid
+    fun testCreateQuiz2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "name": "testq2",
+            "state": "bruh",
+            "questions": ["653204f2b4133a26845ac5ec", "6532050b0095e01223740fff"]
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/createQuiz")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("State should be one of HIDDEN, CLOSED, FINISHED or OPEN, given state is bruh", bodyAsText())
+        }
+    }
+
+    @Test // Invalid
+    fun testCreateQuiz3() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "name": "testq3",
+            "state": "OPEN",
+            "questions": ["", "6532050b0095e01223740fff"]
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/createQuiz")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.BadRequest, status)
+            assertEquals("Invalid question selected.", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testGetQuiz1() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "quizId": "6531f3843d115778d99ebc73"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuiz")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.get(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+//            assertEquals("State should be OPEN or FINISHED for questions to be visible", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testGetQuiz2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "quizId": "6531dc554aa6dd5caca90987"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuiz")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.get(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Quiz is NULL", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testGetQuiz3() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+        }
+
+        val requestBody = """
+        {
+            "quizId": "6531f3cfe9f50d572b6b1ed5"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuiz")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.get(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
 }
