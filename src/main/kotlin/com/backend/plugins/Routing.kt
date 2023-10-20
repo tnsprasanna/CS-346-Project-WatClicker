@@ -1,7 +1,7 @@
 package com.backend.plugins
 
-import com.backend.routes.authenticate
 import com.backend.data.user.UserDataSource
+import com.backend.routes.*
 import com.backend.data.questions.QuestionDataSource
 import com.backend.routes.getSecretInfo
 import com.backend.security.hashing.HashingService
@@ -32,6 +32,10 @@ fun Application.configureRouting(
         addQuestion(questionDataSource, hashingService)
         getQuestion(questionDataSource, hashingService)
         deleteQuestion(questionDataSource, hashingService)
+        getClassSections()
+        getUsers(userDataSource)
+        getStudents(userDataSource)
+        getTeachers(userDataSource)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")

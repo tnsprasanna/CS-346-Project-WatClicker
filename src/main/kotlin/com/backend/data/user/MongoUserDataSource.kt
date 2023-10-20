@@ -1,8 +1,12 @@
 package com.backend.data.user
 
 import User
+import com.backend.data.Constants
+import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import org.litote.kmongo.ne
+import org.litote.kmongo.util.KMongoUtil
 
 class MongoUserDataSource(
     db: CoroutineDatabase
@@ -20,4 +24,18 @@ class MongoUserDataSource(
 
         return users.insertOne(user).wasAcknowledged()
     }
+
+    override suspend fun getUsers(): List<User> {
+        return  users.find().toList();
+    }
+
+    override suspend fun getTeachers(): List<User> {
+        return users.find(User::role eq Constants.teacher_role).toList();
+    }
+
+    override suspend fun getStudents(): List<User> {
+        return users.find(User::role eq Constants.student_role).toList();
+    }
+
+
 }
