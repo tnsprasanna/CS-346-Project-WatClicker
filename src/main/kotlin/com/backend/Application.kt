@@ -1,6 +1,7 @@
 package com.backend
 
 import User
+import com.backend.data.quiz.MongoQuizDataSource
 import com.backend.data.questions.MongoQuestionDataSource
 import com.backend.data.user.MongoUserDataSource
 import com.backend.plugins.*
@@ -28,6 +29,7 @@ fun Application.module() {
         .getDatabase(mongoDBName)
 
     val userDataSource = MongoUserDataSource(db);
+    val quizDataSource = MongoQuizDataSource(db);
     val questionDataSource = MongoQuestionDataSource(db)
     val tokenService = JwtTokenService()
     val tokenConfig = TokenConfig(
@@ -41,6 +43,5 @@ fun Application.module() {
     configureSerialization()
     configureMonitoring()
     configureSecurity(tokenConfig)
-    configureRouting(userDataSource, questionDataSource, hashingService, tokenService, tokenConfig)
-}
+    }
 
