@@ -1,7 +1,6 @@
-package com.backend
+package com.backend.routes
 
 import User
-import com.backend.authenticate
 import com.backend.data.Constants
 //import com.backend.data.requests.AuthRequests
 import com.backend.data.requests.SignInRequest
