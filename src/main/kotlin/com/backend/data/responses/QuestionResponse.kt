@@ -1,9 +1,9 @@
-package com.backend.data.requests
+package com.backend.data.responses
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class QuestionRequest (
+data class QuestionResponse(
     val question: String,
     val options: List<String>,
     val responses: List<Int>,

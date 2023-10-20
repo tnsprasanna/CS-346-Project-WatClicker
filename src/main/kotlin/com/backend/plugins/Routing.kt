@@ -10,6 +10,8 @@ import com.backend.security.token.TokenService
 import com.backend.routes.signIn
 import com.backend.routes.signUp
 import com.backend.routes.addQuestion
+import com.backend.routes.getQuestion
+import com.backend.routes.deleteQuestion
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -28,6 +30,8 @@ fun Application.configureRouting(
         authenticate()
         getSecretInfo()
         addQuestion(questionDataSource, hashingService)
+        getQuestion(questionDataSource, hashingService)
+        deleteQuestion(questionDataSource, hashingService)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")
