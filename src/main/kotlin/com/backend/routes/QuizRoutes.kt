@@ -107,7 +107,7 @@ fun Route.deleteQuiz(quizDataSource: QuizDataSource) {
 
         val quiz = quizDataSource.deleteQuiz(request.quizId)
 
-        call.respond(HttpStatusCode.OK, DeleteQuizResponse("Deletion is successful"))
+        call.respond(HttpStatusCode.OK, DeleteQuizResponse("Deletion was successful"))
 
     }
 }
