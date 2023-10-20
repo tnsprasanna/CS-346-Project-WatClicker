@@ -25,13 +25,13 @@ fun Route.createLecture(
 
         val areFieldsBlank = request.name.isBlank();
 
-        val existingLecture = lectureDataSource.getLectureByName(request.name)
+        val existingUser = lectureDataSource.getLectureByName(request.name)
 
         if (areFieldsBlank) { // All user fields must be filled in
             call.respond(HttpStatusCode.Conflict, "Some fields are blank!");
             return@post
         }
-        else if (existingLecture != null) {
+        else if (existingUser != null) {
             call.respond(HttpStatusCode.Conflict, "Lecture exists.");
             return@post
         }
