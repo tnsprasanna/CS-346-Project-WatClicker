@@ -2,14 +2,7 @@ package com.backend.routes
 
 import com.backend.data.questions.Question
 import com.backend.data.questions.QuestionDataSource
-<<<<<<< HEAD
-import com.backend.data.requests.GetQuestionRequest
 import com.backend.data.requests.QuestionRequest
-import com.backend.data.responses.AuthResponse
-import com.backend.data.responses.QuestionResponse
-=======
-import com.backend.data.requests.QuestionRequest
->>>>>>> ce323f5 ([Sprint 1] add question API)
 import com.backend.security.hashing.HashingService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -41,59 +34,4 @@ fun Route.addQuestion(
         call.respond(HttpStatusCode.OK,request.question)
     }
 
-<<<<<<< HEAD
-}
-
-fun Route.getQuestion(
-    questionDataSource: QuestionDataSource,
-    hashingService: HashingService
-) {
-    get("getQuestion") {
-        val request = kotlin.runCatching { call.receiveNullable<GetQuestionRequest>() }.getOrNull() ?: kotlin.run {
-            call.respond(HttpStatusCode.BadRequest)
-            return@get
-        }
-
-        val questionId = request.questionId
-        val selectedQuestion = questionDataSource.getQuestion(questionId)
-
-        if (selectedQuestion == null) {
-            call.respond(HttpStatusCode.BadRequest, "selectedq was null")
-            return@get
-        }
-
-        val questionResponse =
-            QuestionResponse(
-                question = selectedQuestion.question,
-                options = selectedQuestion.options,
-                responses = selectedQuestion.responses,
-                answer = selectedQuestion.answer,
-            )
-
-        call.respond(
-            HttpStatusCode.OK,
-            message = questionResponse
-        )
-    }
-}
-fun Route.deleteQuestion(
-    questionDataSource: QuestionDataSource,
-    hashingService: HashingService
-) {
-    get("deleteQuestion") {
-        val request = kotlin.runCatching { call.receiveNullable<GetQuestionRequest>() }.getOrNull() ?: kotlin.run {
-            call.respond(HttpStatusCode.BadRequest)
-            return@get
-        }
-
-        val questionId = request.questionId
-        val deleteResult = questionDataSource.deleteQuestion(questionId)
-        if (!deleteResult) {
-            call.respond(HttpStatusCode.OK, "nothing was deleted.")
-        }
-        call.respond(HttpStatusCode.OK, "deletion successful")
-
-    }
-=======
->>>>>>> ce323f5 ([Sprint 1] add question API)
 }
