@@ -1,5 +1,7 @@
 package com.backend.plugins
 
+import com.backend.*
+import com.backend.data.quiz.QuizDataSource
 import com.backend.routes.authenticate
 import com.backend.authenticate
 import com.backend.*
@@ -41,6 +43,7 @@ fun Application.configureRouting(
         getQuiz(quizDataSource)
         changeState(quizDataSource)
         deleteQuiz(quizDataSource)
+        createQuiz(quizDataSource)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")

@@ -28,6 +28,7 @@ fun Application.module() {
         .getDatabase(mongoDBName)
 
     val userDataSource = MongoUserDataSource(db);
+    val questionDataSource = MongoQuestionDataSource(db)
     val quizDataSource = MongoQuizDataSource(db);
     val tokenService = JwtTokenService()
     val tokenConfig = TokenConfig(
@@ -42,5 +43,6 @@ fun Application.module() {
     configureMonitoring()
     configureSecurity(tokenConfig)
     configureRouting(userDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+    configureRouting(userDataSource, questionDataSource, hashingService, tokenService, tokenConfig)
 }
 
