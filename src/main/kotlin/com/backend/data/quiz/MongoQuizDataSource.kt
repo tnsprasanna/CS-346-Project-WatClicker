@@ -1,9 +1,7 @@
 package com.backend.data.quiz
 
 import Quiz
-import User
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.eq
 
 class MongoQuizDataSource(
     db: CoroutineDatabase

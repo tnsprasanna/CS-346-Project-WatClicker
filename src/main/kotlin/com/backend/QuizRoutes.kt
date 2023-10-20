@@ -17,9 +17,11 @@ fun Route.createQuiz(quizDataSource: QuizDataSource) {
             return@post
         }
 
-        if (request.state !== Constants.HIDDEN && request.state !== Constants.FINISHED
-            && request.state !== Constants.CLOSED && request.state !== Constants.OPEN) {
-            call.respond(HttpStatusCode.Conflict, "State should be one of HIDDEN, CLOSED, FINISHED or OPEN")
+        if (request.state != Constants.HIDDEN && request.state != Constants.FINISHED
+            && request.state != Constants.CLOSED && request.state != Constants.OPEN) {
+            call.respond(HttpStatusCode.Conflict,
+                "State should be one of HIDDEN, CLOSED, FINISHED or OPEN, given state is ${request.state}")
+            return@post;
         }
 
         // check that question id exists
