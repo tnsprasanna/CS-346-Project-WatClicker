@@ -28,7 +28,7 @@ fun Application.configureRouting(
         getSecretInfo()
 
         get("") {
-            call.respond(HttpStatusCode.OK, "Hello, World!")
+            call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")
         }
     }
 }

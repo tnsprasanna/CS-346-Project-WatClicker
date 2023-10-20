@@ -14,6 +14,10 @@ class MongoUserDataSource(
     }
 
     override suspend fun insertUser(user: User): Boolean {
+        val existingUser = users.findOne(User::username eq user.username);
+
+        if (existingUser != null) { return false; }
+
         return users.insertOne(user).wasAcknowledged()
     }
 }

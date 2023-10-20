@@ -2,7 +2,10 @@ package com.backend
 
 import User
 import com.backend.authenticate
-import com.backend.data.requests.AuthRequests
+import com.backend.data.Constants
+//import com.backend.data.requests.AuthRequests
+import com.backend.data.requests.SignInRequest
+import com.backend.data.requests.SignUpRequest
 import com.backend.data.responses.AuthResponse
 import com.backend.data.user.UserDataSource
 import com.backend.security.hashing.HashingService
@@ -23,34 +26,55 @@ fun Route.signUp(
     hashingService: HashingService
 ) {
     post("signup") {
-        val request = kotlin.runCatching { call.receiveNullable<AuthRequests>() }.getOrNull() ?: kotlin.run {
+        val request = kotlin.runCatching { call.receiveNullable<SignUpRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
 
-        val areFieldsBlank = request.username.isBlank() || request.password.isBlank()
-        val isPwTooShort = request.password.length < 8
+        val areFieldsBlank = request.username.isBlank()
+                || request.password.isBlank()
+                || request.role.isBlank()
+                || request.firstname.isBlank()
+                || request.lastname.isBlank();
+        val isPwTooShort = request.password.length < 8;
+        val isRoleInvalid = (request.role != Constants.teacher_role) && (request.role != Constants.student_role);
+        val existingUser = userDataSource.getUserByUsername(request.username)
 
-        if (areFieldsBlank || isPwTooShort) {
-            call.respond(HttpStatusCode.Conflict)
+        if (areFieldsBlank) { // All user fields must be filled in
+            call.respond(HttpStatusCode.Conflict, "Some fields are blank!");
+            return@post
+        } else if (isPwTooShort) { // Password should be long enough
+            call.respond(HttpStatusCode.Conflict, "Password is too short! Length should be >= 8.");
+            return@post
+        } else if (isRoleInvalid) { // Should be a valid role
+            call.respond(HttpStatusCode.Conflict, "Role is invalid! Should be 'TEACHER' or 'STUDENT'.")
+            return@post
+        } else if (existingUser != null) { // Username must be available
+            call.respond(HttpStatusCode.Conflict, "Username Taken! Please use another username.")
             return@post
         }
 
+        // Generate Salt and Hash for new user
         val saltedHash = hashingService.generateSaltedHash(request.password)
 
         val user = User(
             username = request.username,
             password = saltedHash.hash,
-            salt = saltedHash.salt
-        )
+            salt = saltedHash.salt,
+            role = request.role,
+            firstname = request.firstname,
+            lastname = request.lastname
+        );
+
+        // Try to insert new user into DB
         val wasAcknowledged = userDataSource.insertUser(user)
 
-        if (!wasAcknowledged) {
-            call.respond(HttpStatusCode.Conflict)
+        if (!wasAcknowledged) { // Error inserting new user into DB
+            call.respond(HttpStatusCode.Conflict, "Unable to create user! Database Error.");
             return@post
         }
 
-        call.respond(HttpStatusCode.OK)
+        call.respond(HttpStatusCode.OK, "User Created!");
     }
 }
 
@@ -61,14 +85,14 @@ fun Route.signIn(
     tokenConfig: TokenConfig
 ) {
     post("signin") {
-        val request = kotlin.runCatching { call.receiveNullable<AuthRequests>() }.getOrNull() ?: kotlin.run {
+        val request = kotlin.runCatching { call.receiveNullable<SignInRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
 
         val user = userDataSource.getUserByUsername(request.username)
-        if (user == null) {
-            call.respond(HttpStatusCode.Conflict, "err1")
+        if (user == null) { // Username must exist
+            call.respond(HttpStatusCode.Conflict, "Unable to Sign-In! Username not found.")
             return@post
         }
 
@@ -80,10 +104,8 @@ fun Route.signIn(
             )
         )
 
-        println(isValidPassword)
-
-        if (!isValidPassword) {
-            call.respond(HttpStatusCode.Conflict, "err2")
+        if (!isValidPassword) { // Handle incorrect password
+            call.respond(HttpStatusCode.Conflict, "Unable to Sign-In! Password Incorrect.")
             return@post
         }
 

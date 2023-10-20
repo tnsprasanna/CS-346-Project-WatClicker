@@ -3,7 +3,7 @@ package com.backend.data.requests
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AuthRequests (
+data class SignInRequest (
     val username: String,
-    val password: String
+    val password: String,
 )
