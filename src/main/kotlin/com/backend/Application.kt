@@ -1,6 +1,7 @@
 package com.backend
 
 import User
+import com.backend.data.quiz.MongoQuizDataSource
 import com.backend.data.user.MongoUserDataSource
 import com.backend.plugins.*
 import com.backend.security.hashing.SHA256HashingService
@@ -27,6 +28,7 @@ fun Application.module() {
         .getDatabase(mongoDBName)
 
     val userDataSource = MongoUserDataSource(db);
+    val quizDataSource = MongoQuizDataSource(db);
     val tokenService = JwtTokenService()
     val tokenConfig = TokenConfig(
         issuer = environment.config.property("jwt.issuer").getString(),
@@ -39,6 +41,6 @@ fun Application.module() {
     configureSerialization()
     configureMonitoring()
     configureSecurity(tokenConfig)
-    configureRouting(userDataSource, hashingService, tokenService, tokenConfig)
+    configureRouting(userDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
 }
 

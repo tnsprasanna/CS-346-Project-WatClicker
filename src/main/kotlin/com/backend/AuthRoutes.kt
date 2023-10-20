@@ -3,7 +3,6 @@ package com.backend
 import User
 import com.backend.authenticate
 import com.backend.data.Constants
-//import com.backend.data.requests.AuthRequests
 import com.backend.data.requests.SignInRequest
 import com.backend.data.requests.SignUpRequest
 import com.backend.data.responses.AuthResponse
@@ -37,7 +36,7 @@ fun Route.signUp(
                 || request.firstname.isBlank()
                 || request.lastname.isBlank();
         val isPwTooShort = request.password.length < 8;
-        val isRoleInvalid = (request.role != Constants.teacher_role) && (request.role != Constants.student_role);
+        val isRoleInvalid = (request.role != Constants.TEACHER_ROLE) && (request.role != Constants.STUDENT_ROLE);
         val existingUser = userDataSource.getUserByUsername(request.username)
 
         if (areFieldsBlank) { // All user fields must be filled in
