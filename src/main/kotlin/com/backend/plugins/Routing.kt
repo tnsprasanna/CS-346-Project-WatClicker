@@ -40,6 +40,9 @@ fun Application.configureRouting(
         getStudents(userDataSource)
         getTeachers(userDataSource)
         createQuiz(quizDataSource)
+        getQuiz(quizDataSource)
+        changeState(quizDataSource)
+        deleteQuiz(quizDataSource)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")
