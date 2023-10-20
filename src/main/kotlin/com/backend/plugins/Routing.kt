@@ -1,14 +1,18 @@
 package com.backend.plugins
 
+import com.backend.authenticate
 import com.backend.*
 import com.backend.data.quiz.QuizDataSource
 import com.backend.data.user.UserDataSource
+import com.backend.getSecretInfo
 import com.backend.routes.*
 import com.backend.data.questions.QuestionDataSource
 import com.backend.routes.getSecretInfo
 import com.backend.security.hashing.HashingService
 import com.backend.security.token.TokenConfig
 import com.backend.security.token.TokenService
+import com.backend.signIn
+import com.backend.signUp
 import com.backend.routes.signIn
 import com.backend.routes.signUp
 import com.backend.routes.addQuestion
