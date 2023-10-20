@@ -1,0 +1,109 @@
+I'm thinking we can implement something like the following for this sprint:
+
+NOTES FOR THIS SPRINT:
+- Only 1 teacher User
+- 5 Student Users
+- Only 1 class
+- HardCode their mongo UserIds into the endpoints, make every endpoint open (unsecure)
+- Check JWT and Authentication and stuff for a later sprint
+- Quiz Visible state removed for this sprint - revisit for later sprint - go directly from hidden to open state
+
+DataBase Models:
+    User:
+        - _id: ObjectID 
+        - email (acts as username): String (DONE)
+        - password: String (DONE)
+        - salt: String (DONE)
+- role: "teacher" | "student" - (SAI) (DONE)
+- firstname: String - (SAI) (DONE)
+- lastname: String - (SAI) (DONE)
+        - classSectionList (for students this is the classes they are in, and for teachers it's what they teach): [ClassSection ObjectIDs] - (LATER SPRINT)
+
+    ClassSection - Sineha
+        - _id: ObjectID
+        - name: String (example: "CS346 - Section 002")
+        - teacher: User ObjectID (LATER SPRINT)
+        - students: [User ObjectIDs] (LATER SPRINT)
+        - active (is the class active or not, active meaning running in the current term): Boolean (Leave it as Active - init it for rn but don't do anything with it)
+        - quizzes: [Quiz ObjectID] (LATER SPRINT)
+        - joinCode: String (used to join a student) (LATER SPRINT)
+        - isJoinable: Boolean (LATER SPRINT)
+
+    Quiz - Vipasha
+        - _id: ObjectID
+        - name: String (example: "Quiz 4 - Functional Kotlin")
+        - state: "Hidden" | "Open" | "Closed" | "Finished" 
+        - questions: [Question ObjectID]
+        (
+            Clarifications:
+                - hidden means visible to the teacher, not to students
+                - visible means visible to everyone, teachers can see questions but students cant (Maybe implement this later)
+                - open means visible to everyone, students can answer questions
+                - closed means visible to everyone, students cannot answer questions, and results are not shown
+                - finished means visible to everyone, students cannot answer questions, and results are shown
+        )
+
+    Question - Tracy
+        - _id: ObjectID
+        - question: String
+        - options: [String]
+        - responses = [Number]
+        - answer: Number
+        - selections: [Selection ObjectID] (LATER SPRINT)
+        (
+            Clarifications:
+                - suppose there are 4 options, responses will look like [0, 0, 0, 0] and whenever a student selects something, the corresponding index's count increments/decrements
+                - the answer will be the index of the correct option in the options array
+                - assuming we are only supporting single-select questions
+        )
+    
+    Selection: (LATER SPRINT)
+        - _id: ObjectID
+        - question: Question ObjectID
+        - student: Student ObjectID
+        - selectedOption: Number (index of the option they selected)
+        - isCorrect: Boolean
+
+APIs we need:
+    User:
+        - SignUp (DONE)
+        - SignIn (DONE)
+        - Authenticate (DONE)
+        - Secret (DONE) - (userId)
+
+    Teacher:
+- Get Class/Sections they are teaching (THIS SPRINT - Get the list of all class) (SAI)
+        - Create a Class/Section (THIS SPRINT - support but only call once, every classSection has access to every quiz and every user has access to every classSection) (SINEHA)
+        - Get "Join" code for a Class/Section (they they teach) (LATER SPRINT)
+        - Change the "Join" code for a Class/Section (idk y they would do this tho) (LATER SPRINT)
+        - Make a class Joinable/Unjoinable (LATER SPRINT)
+- Get list of Students from their Class/Section (THIS SPRINT - get the list of all users with 'students' role) (SAI)
+        - Remove Student from their Class/Section (LATER SPRINT)
+        - Get Quizzes in a Class/Section (that they teach) (THIS SPRINT - get the list of all the quizes) (SINEHA)
+        - Create a Quiz for a Class/Section  (THIS SPRINT) (PRASANNA)
+        - Delete a Quiz for a Class/Section (THIS SPRINT) (PRASANNA)
+        - Change a Quiz's state (make it visible/hidden, open/close it, show answers) (THIS SPRINT) (PRASANNA)
+        - Restart/Reset Quiz so that it is open but has no responses and student's can select whatever they want (LATER SPRINT - "not real time enough")
+        - Get Questions in a Quiz (THIS SPRINT) (TRACY)
+        - Add Questions in a Quiz (THIS SPRINT) (TRACY)
+        - Remove Questions in a Quiz (THIS SPRINT) (TRACY)
+        - Edit Questions in a Quiz (THIS SPRINT) (TRACY)
+
+    Student:
+        - Join a class using a "Join" code (LATER SPRINT)
+- Get Class/Sections they are in (THIS SPRINT - return the list of all classes) (SAI)
+        - Exit a Class/Section they are in (LATER SPRINT)
+        - Get (student viewable) Quizzes for a Class/Section they are in (THIS SPRINT - get a list of all quizes) (SINEHA)
+        - Get questions for a quiz (if it's viewable) (THIS SPRINT) (VIPASHA)
+        - Answer/Update Answer for a Question (THIS SPRINT if it's in the "Open" state) (THIS SPRINT - not doing "update answer", can only make one selection) (VIPASHA)
+        - View answer and stats for a quiz (when they are out) (THIS SPRINT) (VIPASHA)
+
+
+Notes for current architecture:
+- Only supporting 1 teacher per Class/Section atm
+- No support for TA/ISA or whatever
+- Assuming we are only having single choice, textual questions
+- idk how "live"/"realtime" this would be
+- Need to be able to track who selected which option for every question. This is so that students can answer a question for the first time or update an answer (while a quiz is live). I added some stuff about selection but I'm not sure if this is a good way to handle this.
+- We currently have no support for marks
+- I think we should add some SysAdmin support (for us) to make changes/test stuff

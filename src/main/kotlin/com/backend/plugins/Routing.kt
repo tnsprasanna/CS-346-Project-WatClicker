@@ -1,7 +1,6 @@
 package com.backend.plugins
 
 import com.backend.authenticate
-import com.backend.data.requests.AuthRequests
 import com.backend.data.user.UserDataSource
 import com.backend.getSecretInfo
 import com.backend.security.hashing.HashingService
