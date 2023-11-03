@@ -21,6 +21,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import com.backend.data.lecture.LectureDataSource
 
+
 fun Application.configureRouting(
     userDataSource: UserDataSource,
     questionDataSource: QuestionDataSource,
@@ -47,6 +48,7 @@ fun Application.configureRouting(
         changeState(quizDataSource)
         deleteQuiz(quizDataSource)
         createLecture(lectureDataSource)
+        deleteLecture(lectureDataSource)
 
 
         get("") {

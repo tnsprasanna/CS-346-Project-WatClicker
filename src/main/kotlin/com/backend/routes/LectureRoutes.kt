@@ -4,6 +4,9 @@ import Lecture
 import com.backend.data.Constants
 import com.backend.data.requests.LectureRequest
 import com.backend.data.lecture.LectureDataSource
+import com.backend.data.requests.DeleteLectureRequest
+import com.backend.data.quiz.QuizDataSource
+import com.backend.data.requests.DeleteQuizRequest
 import com.backend.security.hashing.HashingService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -12,6 +15,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import com.backend.data.responses.AuthResponse
+import com.backend.data.responses.DeleteLectureResponse
 
 fun Route.createLecture(
     lectureDataSource: LectureDataSource,
@@ -41,7 +45,7 @@ fun Route.createLecture(
 
             );
 
-        val wasAcknowledged = lectureDataSource.addLecture(lecture)
+        val wasAcknowledged = lectureDataSource.createLecture(lecture)
 
         if (!wasAcknowledged) { // Error inserting new user into DB
             call.respond(HttpStatusCode.Conflict, "Unable to create lecture! Database Error.");
@@ -52,6 +56,21 @@ fun Route.createLecture(
     }
 }
 
+fun Route.deleteLecture(lectureDataSource: LectureDataSource) {
+    delete("deleteLecture") {
+
+
+        val request = kotlin.runCatching { call.receiveNullable<DeleteLectureRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@delete
+        }
+
+        val lecture = lectureDataSource.deleteLecture(request.lectureId)
+
+        call.respond(HttpStatusCode.OK, DeleteLectureResponse("Deletion was successful"))
+
+    }
+}
 fun Route.getQuizFromLecture() {
     get("getQuizFromLecture") {
         call.respond(HttpStatusCode.OK)
