@@ -46,7 +46,8 @@ fun Route.createQuiz(quizDataSource: QuizDataSource, questionDataSource: Questio
                 quizId = quizId,
                 name = request.name,
                 state = request.state,
-                questionIds = request.questionIds
+                questionIds = request.questionIds,
+                lectureId = ObjectId(request.lectureId)
             );
             // Try to insert new user into DB
             val wasAcknowledged = quizDataSource.createQuiz(quiz);
