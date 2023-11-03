@@ -403,7 +403,7 @@ fun Route.makeClassSectionJoinable(
 fun Route.makeClassSectionUnjoinable(
     lectureDataSource: LectureDataSource
 ) {
-    post("makeClassSectionJoinable") {
+    post("makeClassSectionUnjoinable") {
         val request = kotlin.runCatching { call.receiveNullable<ClassSectionIdRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest, "Couldn't parse params!")
             return@post
@@ -461,6 +461,19 @@ fun Route.joinClassSection(
 
         if (classSection.joinCode != request.classSectionJoinCode) {
             call.respond(HttpStatusCode.BadRequest, "Invalid Join Code!")
+            return@post
+        }
+
+        var studentInClass = false;
+        for (classSectionId in user.classSectionList) {
+            if (classSectionId.toString() == request.classSectionId) {
+                studentInClass = true
+                break
+            }
+        }
+
+        if (studentInClass) {
+            call.respond(HttpStatusCode.BadRequest, "Already Enrolled in this Class!")
             return@post
         }
 
