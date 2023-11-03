@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import com.backend.data.lecture.MongoLectureDataSource
+import com.backend.data.selection.MongoSelectionDataSource
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -32,6 +33,8 @@ fun Application.module() {
     val userDataSource = MongoUserDataSource(db);
     val quizDataSource = MongoQuizDataSource(db);
     val questionDataSource = MongoQuestionDataSource(db);
+    val lectureDataSource = MongoLectureDataSource(db);
+    val selectionDataSource = MongoSelectionDataSource(db);
     val tokenService = JwtTokenService()
     val tokenConfig = TokenConfig(
         issuer = environment.config.property("jwt.issuer").getString(),
@@ -40,12 +43,13 @@ fun Application.module() {
         secret = System.getenv("JWT_SECRET")?: "JF8sFEEzZw"
     )
     val hashingService = SHA256HashingService()
-    val lectureDataSource = MongoLectureDataSource(db);
+
 
     configureSerialization()
     configureMonitoring()
     configureSecurity(tokenConfig)
-    configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+    configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService,
+        tokenService, tokenConfig, lectureDataSource, selectionDataSource)
 }
 
 /*

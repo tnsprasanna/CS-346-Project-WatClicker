@@ -2,10 +2,11 @@ package com.backend.routes
 
 import com.backend.data.questions.Question
 import com.backend.data.questions.QuestionDataSource
+import com.backend.data.requests.AddSelectionToQuestionRequest
 import com.backend.data.requests.GetQuestionRequest
 import com.backend.data.requests.QuestionRequest
-import com.backend.data.responses.AuthResponse
 import com.backend.data.responses.QuestionResponse
+import com.backend.data.selection.SelectionDataSource
 import com.backend.security.hashing.HashingService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -16,7 +17,6 @@ import java.util.*
 
 fun Route.addQuestion(
     questionDataSource: QuestionDataSource,
-    hashingService: HashingService
 ) {
     post("addQuestion") {
         val request = kotlin.runCatching { call.receiveNullable<QuestionRequest>() }.getOrNull() ?: kotlin.run {
@@ -25,7 +25,7 @@ fun Route.addQuestion(
         }
         val questionId = UUID.randomUUID().toString()
         val question = Question(
-            questionId,
+            questionId = questionId,
             question = request.question,
             options = request.options,
             responses = request.responses,
@@ -43,7 +43,6 @@ fun Route.addQuestion(
 
 fun Route.getQuestion(
     questionDataSource: QuestionDataSource,
-    hashingService: HashingService
 ) {
     get("getQuestion") {
         val request = kotlin.runCatching { call.receiveNullable<GetQuestionRequest>() }.getOrNull() ?: kotlin.run {
@@ -74,7 +73,6 @@ fun Route.getQuestion(
 }
 fun Route.deleteQuestion(
     questionDataSource: QuestionDataSource,
-    hashingService: HashingService
 ) {
     delete("deleteQuestion") {
         val request = kotlin.runCatching { call.receiveNullable<GetQuestionRequest>() }.getOrNull() ?: kotlin.run {
@@ -88,6 +86,35 @@ fun Route.deleteQuestion(
             call.respond(HttpStatusCode.OK, "nothing was deleted.")
         }
         call.respond(HttpStatusCode.OK, "deletion successful")
+
+    }
+}
+
+fun Route.addSelectionToQuestion(
+    questionDataSource: QuestionDataSource,
+    selectionDataSource: SelectionDataSource
+) {
+    patch("addSelectionToQuestion") {
+        val request = kotlin.runCatching { call.receiveNullable<AddSelectionToQuestionRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@patch
+        }
+
+        if (questionDataSource.getQuestion(questionId = request.questionId) == null) {
+            call.respond(HttpStatusCode.Conflict, "question does not exist")
+            return@patch
+        }
+
+        if (selectionDataSource.getSelectionById(selectionId = request.selectionId) == null) {
+            call.respond(HttpStatusCode.Conflict, "selection does not exist")
+            return@patch
+        }
+
+        val wasAcknowledged = questionDataSource.addSelectionToQuestion(request.questionId, request.selectionId)
+        if (!wasAcknowledged) {
+            call.respond(HttpStatusCode.OK, "selection could not be added to question.")
+        }
+        call.respond(HttpStatusCode.OK, "Selection added to question!")
 
     }
 }
