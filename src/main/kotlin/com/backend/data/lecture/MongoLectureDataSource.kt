@@ -1,5 +1,6 @@
 package com.backend.data.lecture
 import Lecture
+import com.backend.data.questions.Question
 import com.mongodb.client.model.Filters
 import org.bson.types.ObjectId
 import org.litote.kmongo.coroutine.CoroutineDatabase
@@ -14,8 +15,17 @@ class MongoLectureDataSource(
         return lectures.findOne(Lecture::name eq name)
     }
 
+    override suspend fun getLectureByID(lectureId: String): Lecture? {
+        return lectures.findOneById(ObjectId(lectureId));
+    }
+
     override suspend fun createLecture(lecture: Lecture): Boolean {
-        return lectures.insertOne(lecture).wasAcknowledged()
+        println("HI!!!!!!!!!!!!!")
+        val result = lectures.insertOne(lecture).wasAcknowledged()
+        println(result)
+        println("HI2!!!!!!!!!!!!!")
+        return result
+
     }
 
     override suspend fun deleteLecture(lectureId: String): String {
