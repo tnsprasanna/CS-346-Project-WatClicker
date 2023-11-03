@@ -8,5 +8,5 @@ data class QuizRequest (
     // must be one of HIDDEN | OPEN | CLOSED | FINISHED
     val state: String,
     // must be a list of IDs of existing questions
-    val questions: Array<String>
+    val questionIds: Array<String>
 )

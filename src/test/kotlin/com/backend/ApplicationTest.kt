@@ -1,5 +1,6 @@
 package com.backend
 
+import com.backend.data.lecture.MongoLectureDataSource
 import com.backend.data.questions.MongoQuestionDataSource
 import com.backend.data.quiz.MongoQuizDataSource
 import com.backend.data.user.MongoUserDataSource
@@ -37,10 +38,12 @@ class ApplicationTest {
         secret = System.getenv("JWT_SECRET")?: "JF8sFEEzZw"
     )
     val hashingService = SHA256HashingService()
+    val lectureDataSource = MongoLectureDataSource(db);
+
     @Test
     fun testRoot() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -53,7 +56,7 @@ class ApplicationTest {
     @Test // Username Taken
     fun testSignUp1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -81,7 +84,7 @@ class ApplicationTest {
     @Test // Password Length too Small
     fun testSignUp2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -109,7 +112,7 @@ class ApplicationTest {
     @Test // Invalid Role
     fun testSignUp3() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -137,7 +140,7 @@ class ApplicationTest {
     @Test // Invalid Role
     fun testSignUp4() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -165,7 +168,7 @@ class ApplicationTest {
     @Test // Empty Field(s)
     fun testSignUp5() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -193,7 +196,7 @@ class ApplicationTest {
     @Test // Valid
     fun testSignIn1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -217,7 +220,7 @@ class ApplicationTest {
     @Test // Invalid Username
     fun testSignIn2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -242,7 +245,7 @@ class ApplicationTest {
     @Test // Invalid Password
     fun testSignIn3() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -267,7 +270,7 @@ class ApplicationTest {
     @Test // Invalid Password
     fun testSignIn4() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -292,7 +295,7 @@ class ApplicationTest {
     @Test // Valid
     fun testGetQuestion1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -315,7 +318,7 @@ class ApplicationTest {
     @Test // Invalid
     fun testGetQuestion2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -339,7 +342,7 @@ class ApplicationTest {
     @Test // Invalid
     fun testAddQuestion1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -365,7 +368,7 @@ class ApplicationTest {
     @Test // Valid
     fun testDeleteQuestion2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -389,7 +392,7 @@ class ApplicationTest {
     @Test // Valid
     fun testCreateQuiz1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -415,7 +418,7 @@ class ApplicationTest {
     @Test // Invalid
     fun testCreateQuiz2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -441,7 +444,7 @@ class ApplicationTest {
     @Test // Invalid
     fun testCreateQuiz3() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -467,7 +470,7 @@ class ApplicationTest {
     @Test
     fun testGetQuiz1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -491,7 +494,7 @@ class ApplicationTest {
     @Test
     fun testGetQuiz2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -515,7 +518,7 @@ class ApplicationTest {
     @Test
     fun testGetQuiz3() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
         }
 
         val requestBody = """
@@ -534,4 +537,53 @@ class ApplicationTest {
             assertEquals(HttpStatusCode.OK, status)
         }
     }
+
+    @Test
+    fun testChangeState() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+        }
+
+        val requestBody = """
+        {
+            "quizId": "6531fe5d68b6f475b3959362",
+            "newState: "CLOSED"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Patch
+        requestBuilder.url("/changeState")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.patch(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testDeleteQuiz() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+        }
+
+        val requestBody = """
+        {
+            "quizId": "6531fc9e13ed7a4cc0bf3bc0"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Delete
+        requestBuilder.url("/deleteQuiz")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals("{\"deletedQuiz\":\"Deletion was successful\"}", bodyAsText())
+        }
+    }
+
 }

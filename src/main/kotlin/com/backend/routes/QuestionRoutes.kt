@@ -12,6 +12,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.util.*
 
 fun Route.addQuestion(
     questionDataSource: QuestionDataSource,
@@ -22,8 +23,9 @@ fun Route.addQuestion(
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-
+        val questionId = UUID.randomUUID().toString()
         val question = Question(
+            questionId,
             question = request.question,
             options = request.options,
             responses = request.responses,
@@ -34,7 +36,7 @@ fun Route.addQuestion(
             call.respond(HttpStatusCode.Conflict, "Unable to create user! Database Error.");
             return@post
         }
-        call.respond(HttpStatusCode.OK,request.question)
+        call.respond(HttpStatusCode.OK,questionId)
     }
 
 }
@@ -56,7 +58,6 @@ fun Route.getQuestion(
             call.respond(HttpStatusCode.BadRequest, "selectedq was null")
             return@get
         }
-
         val questionResponse =
             QuestionResponse(
                 question = selectedQuestion.question,
@@ -75,10 +76,10 @@ fun Route.deleteQuestion(
     questionDataSource: QuestionDataSource,
     hashingService: HashingService
 ) {
-    get("deleteQuestion") {
+    delete("deleteQuestion") {
         val request = kotlin.runCatching { call.receiveNullable<GetQuestionRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
-            return@get
+            return@delete
         }
 
         val questionId = request.questionId
