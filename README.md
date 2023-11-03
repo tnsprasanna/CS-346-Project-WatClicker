@@ -24,6 +24,12 @@ iClicker App:
    User signup, sign in and authentication 
    Getting the answers and the responses for each question in a given quiz
 
+## Tasks completed for Sprint 2
+- Created the selection model
+- Created the frontend interface for student view (navigation between screens)
+- Created the API responses for respective API calls to display data (sign up, log in, view classes, view quizzes, view questions)
+- Created additional backend APIs (supporting user fields, extending model to support class sections)
+
 ## Project Documents
 Project proposal: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Project-Proposal
 Meeting minutes: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Meeting-Minutes
