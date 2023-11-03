@@ -2,14 +2,11 @@ package com.backend.routes
 
 import Lecture
 import com.backend.data.Constants
-import com.backend.data.requests.LectureRequest
-import com.backend.data.requests.GetLectureByIDRequest
 import com.backend.data.lecture.LectureDataSource
 import com.backend.data.questions.QuestionDataSource
-import com.backend.data.requests.DeleteLectureRequest
 import com.backend.data.quiz.QuizDataSource
-import com.backend.data.requests.DeleteQuizRequest
-import com.backend.data.requests.GetQuestionRequest
+import com.backend.data.requests.*
+import com.backend.data.responses.*
 import com.backend.security.hashing.HashingService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -17,9 +14,6 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.backend.data.responses.AuthResponse
-import com.backend.data.responses.DeleteLectureResponse
-import com.backend.data.responses.QuestionResponse
 import org.bson.types.ObjectId
 
 fun Route.createLecture(
@@ -74,9 +68,28 @@ fun Route.deleteLecture(lectureDataSource: LectureDataSource) {
 
     }
 }
-fun Route.getQuizFromLecture() {
-    get("getQuizFromLecture") {
+fun Route.getQuizzesFromLecture() {
+    get("getQuizzesFromLecture") {
         call.respond(HttpStatusCode.OK)
+    }
+
+}
+
+fun Route.getLectureQuizzes(lectureDataSource: LectureDataSource) { //maybe getQuestions
+    get("getLectureQuizzes") {
+        val request = kotlin.runCatching { call.receiveNullable<GetLectureQuizzesRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@get
+        }
+
+        val lecture = lectureDataSource.getClassSectionQuizzes(request.lectureId)
+
+
+       if (lecture != null) {
+           call.respond(HttpStatusCode.OK, GetLectureQuizzesResponse(quizIds = lecture))
+           call.respond(HttpStatusCode.OK)
+
+       }
     }
 }
 
