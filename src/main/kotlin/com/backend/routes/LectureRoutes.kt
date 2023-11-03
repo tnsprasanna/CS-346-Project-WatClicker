@@ -42,7 +42,7 @@ fun Route.createLecture(
         val lecture = Lecture(
             name = request.name,
             active = request.active,
-
+            quizIds = request.quizIds
             );
 
         val wasAcknowledged = lectureDataSource.createLecture(lecture)

@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class LectureRequest (
         val name: String,
         val active: Boolean,
+        val quizIds: Array<String>
     )
