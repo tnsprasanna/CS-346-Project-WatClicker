@@ -12,5 +12,6 @@ data class UserResponse(
     val username: String,
     val role: String,
     val firstname: String,
-    val lastname: String
+    val lastname: String,
+    val classSectionList: List<String>
 )
