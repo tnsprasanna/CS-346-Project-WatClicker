@@ -13,15 +13,16 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
+import com.backend.data.lecture.MongoLectureDataSource
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
 fun Application.module() {
-    val mongoUserName: String = System.getenv("MONGODB_USERNAME")
-    val mongoPWD = System.getenv("MONGODB_PWD")
-    val mongoDBName = System.getenv("MONGODB_NAME")
+    val mongoUserName: String = System.getenv("MONGODB_USERNAME")?: "backend"
+    val mongoPWD = System.getenv("MONGODB_PWD")?: "3Vdek4PjNBEhu00O"
+    val mongoDBName = System.getenv("MONGODB_NAME")?: "db1"
 
     val db = KMongo.createClient(
         connectionString = "mongodb+srv://$mongoUserName:$mongoPWD@cluster0.3mqtfy8.mongodb.net/$mongoDBName?retryWrites=true&w=majority"
@@ -36,13 +37,14 @@ fun Application.module() {
         issuer = environment.config.property("jwt.issuer").getString(),
         audience = environment.config.property("jwt.audience").getString(),
         expiresIn = 365L * 1000L * 60L * 24L,
-        secret = System.getenv("JWT_SECRET")
+        secret = System.getenv("JWT_SECRET")?: "JF8sFEEzZw"
     )
     val hashingService = SHA256HashingService()
+    val lectureDataSource = MongoLectureDataSource(db);
 
     configureSerialization()
     configureMonitoring()
     configureSecurity(tokenConfig)
-    configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
+    configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
 }
 

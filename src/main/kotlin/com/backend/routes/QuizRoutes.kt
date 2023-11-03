@@ -110,7 +110,6 @@ fun Route.deleteQuiz(quizDataSource: QuizDataSource) {
         }
 
         val quiz = quizDataSource.deleteQuiz(request.quizId)
-
         call.respond(HttpStatusCode.OK, DeleteQuizResponse("${request.quizId} has been deleted"))
 
     }

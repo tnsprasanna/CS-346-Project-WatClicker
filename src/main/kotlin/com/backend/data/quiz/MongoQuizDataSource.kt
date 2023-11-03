@@ -24,6 +24,7 @@ class MongoQuizDataSource(
     // works
     override suspend fun changeState(quizId: String, newState: String): String {
         val filter = Filters.eq("quizId", quizId)
+        val filter = Filters.eq("_id", ObjectId(quizId))
         val update = Updates.set(Quiz::state.name, newState)
         return quizzes.updateOne(filter, update).toString();
     }
