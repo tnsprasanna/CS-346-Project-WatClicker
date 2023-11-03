@@ -212,7 +212,27 @@ fun Route.changeRole(
     userDataSource: UserDataSource
 ) {
     post("changeRole") {
-        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+        val request = kotlin.runCatching { call.receiveNullable<UserIdRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val user = userDataSource.getUserById(request.userId)?: kotlin.run {
+            call.respond(HttpStatusCode.Conflict, "User Not Found")
+            return@post
+        }
+
+        var newRole = Constants.STUDENT_ROLE
+        if (user.role == Constants.STUDENT_ROLE) { newRole = Constants.TEACHER_ROLE }
+
+        val res = userDataSource.changeRole(request.userId, newRole)
+        if (!res) {
+            call.respond(HttpStatusCode.Conflict, "Could not change user role")
+            return@post
+        }
+
+        call.respond(HttpStatusCode.OK, "Role changed to $newRole")
+        return@post
     }
 }
 
@@ -220,7 +240,24 @@ fun Route.changeFirstName(
     userDataSource: UserDataSource
 ) {
     post("changeFirstName") {
-        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+        val request = kotlin.runCatching { call.receiveNullable<ChangeNameRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val user = userDataSource.getUserById(request.userId)?: kotlin.run {
+            call.respond(HttpStatusCode.Conflict, "User Not Found")
+            return@post
+        }
+
+        val res = userDataSource.changeFirstName(request.userId, request.newFirstName)
+        if (!res) {
+            call.respond(HttpStatusCode.Conflict, "Could not change user FirstName")
+            return@post
+        }
+
+        call.respond(HttpStatusCode.OK, "FirstName changed to ${request.newFirstName}")
+        return@post
     }
 }
 
@@ -228,7 +265,24 @@ fun Route.changeLastName(
     userDataSource: UserDataSource
 ) {
     post("changeLastName") {
-        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+        val request = kotlin.runCatching { call.receiveNullable<ChangeNameRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val user = userDataSource.getUserById(request.userId)?: kotlin.run {
+            call.respond(HttpStatusCode.Conflict, "User Not Found")
+            return@post
+        }
+
+        val res = userDataSource.changeLastName(request.userId, request.newFirstName)
+        if (!res) {
+            call.respond(HttpStatusCode.Conflict, "Could not change user LastName")
+            return@post
+        }
+
+        call.respond(HttpStatusCode.OK, "LastName changed to ${request.newFirstName}")
+        return@post
     }
 }
 
@@ -236,7 +290,24 @@ fun Route.changeFirstAndLastName(
     userDataSource: UserDataSource
 ) {
     post("changeFirstAndLastName") {
-        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+        val request = kotlin.runCatching { call.receiveNullable<ChangeNameRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val user = userDataSource.getUserById(request.userId)?: kotlin.run {
+            call.respond(HttpStatusCode.Conflict, "User Not Found")
+            return@post
+        }
+
+        val res = userDataSource.changeFirstAndLastName(request.userId, request.newFirstName, request.newLastName)
+        if (!res) {
+            call.respond(HttpStatusCode.Conflict, "Could not change user name")
+            return@post
+        }
+
+        call.respond(HttpStatusCode.OK, "FullName changed to ${request.newFirstName} ${request.newLastName}")
+        return@post
     }
 }
 
@@ -244,7 +315,24 @@ fun Route.changeUsername(
     userDataSource: UserDataSource
 ) {
     post("changeUsername") {
-        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+        val request = kotlin.runCatching { call.receiveNullable<ChangeUsernameRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val user = userDataSource.getUserById(request.userId)?: kotlin.run {
+            call.respond(HttpStatusCode.Conflict, "User Not Found")
+            return@post
+        }
+
+        val res = userDataSource.changeUsername(request.userId, request.newUsername)
+        if (!res) {
+            call.respond(HttpStatusCode.Conflict, "Could not change username")
+            return@post
+        }
+
+        call.respond(HttpStatusCode.OK, "Username changed to ${request.newUsername}")
+        return@post
     }
 }
 
@@ -304,7 +392,7 @@ fun Route.getClassSections(
         }
 
         val user = userDataSource.getUserById(request.userId)?: kotlin.run {
-            call.respond(HttpStatusCode.Conflict, "user not found")
+            call.respond(HttpStatusCode.Conflict, "User not found!")
             return@get
         }
 

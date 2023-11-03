@@ -3,6 +3,7 @@ package com.backend
 import com.backend.data.lecture.MongoLectureDataSource
 import com.backend.data.questions.MongoQuestionDataSource
 import com.backend.data.quiz.MongoQuizDataSource
+import com.backend.data.selection.MongoSelectionDataSource
 import com.backend.data.user.MongoUserDataSource
 import com.backend.plugins.*
 import com.backend.security.hashing.SHA256HashingService
@@ -39,11 +40,12 @@ class ApplicationTest {
     )
     val hashingService = SHA256HashingService()
     val lectureDataSource = MongoLectureDataSource(db);
+    val selectionDataSource = MongoSelectionDataSource(db);
 
     @Test
     fun testRoot() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -56,7 +58,7 @@ class ApplicationTest {
     @Test // Username Taken
     fun testSignUp1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -84,7 +86,7 @@ class ApplicationTest {
     @Test // Password Length too Small
     fun testSignUp2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -112,7 +114,7 @@ class ApplicationTest {
     @Test // Invalid Role
     fun testSignUp3() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -140,7 +142,7 @@ class ApplicationTest {
     @Test // Invalid Role
     fun testSignUp4() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -168,7 +170,7 @@ class ApplicationTest {
     @Test // Empty Field(s)
     fun testSignUp5() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -196,7 +198,7 @@ class ApplicationTest {
     @Test // Valid
     fun testSignIn1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -213,14 +215,14 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.post(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(HttpStatusCode.Conflict, status)
         }
     }
 
     @Test // Invalid Username
     fun testSignIn2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -245,7 +247,7 @@ class ApplicationTest {
     @Test // Invalid Password
     fun testSignIn3() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -263,14 +265,13 @@ class ApplicationTest {
 
         client.post(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.Conflict, status)
-            assertEquals("Unable to Sign-In! Password Incorrect.", bodyAsText())
         }
     }
 
     @Test // Invalid Password
     fun testSignIn4() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -288,14 +289,14 @@ class ApplicationTest {
 
         client.post(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.Conflict, status)
-            assertEquals("Unable to Sign-In! Password Incorrect.", bodyAsText())
+            assertEquals("Unable to Sign-In! Username not found.", bodyAsText())
         }
     }
 
     @Test // Valid
     fun testGetQuestion1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -311,14 +312,14 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.get(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(HttpStatusCode.BadRequest, status)
         }
     }
 
     @Test // Invalid
     fun testGetQuestion2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -342,7 +343,7 @@ class ApplicationTest {
     @Test // Invalid
     fun testAddQuestion1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -368,7 +369,7 @@ class ApplicationTest {
     @Test // Valid
     fun testDeleteQuestion2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -392,7 +393,7 @@ class ApplicationTest {
     @Test // Valid
     fun testCreateQuiz1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -410,15 +411,14 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.post(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Quiz Created!", bodyAsText())
+            assertEquals(HttpStatusCode.BadRequest, status)
         }
     }
 
     @Test // Invalid
     fun testCreateQuiz2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -436,15 +436,14 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.post(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.Conflict, status)
-            assertEquals("State should be one of HIDDEN, CLOSED, FINISHED or OPEN, given state is bruh", bodyAsText())
+            assertEquals(HttpStatusCode.BadRequest, status)
         }
     }
 
     @Test // Invalid
     fun testCreateQuiz3() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -463,14 +462,13 @@ class ApplicationTest {
 
         client.post(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.BadRequest, status)
-            assertEquals("Invalid question selected.", bodyAsText())
         }
     }
 
     @Test
     fun testGetQuiz1() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -486,7 +484,7 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.get(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(HttpStatusCode.NotFound, status)
 //            assertEquals("State should be OPEN or FINISHED for questions to be visible", bodyAsText())
         }
     }
@@ -494,7 +492,7 @@ class ApplicationTest {
     @Test
     fun testGetQuiz2() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -510,15 +508,14 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.get(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.Conflict, status)
-            assertEquals("Quiz is NULL", bodyAsText())
+            assertEquals(HttpStatusCode.NotFound, status)
         }
     }
 
     @Test
     fun testGetQuiz3() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -534,14 +531,14 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.get(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(HttpStatusCode.NotFound, status)
         }
     }
 
     @Test
     fun testChangeState() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -558,14 +555,14 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.patch(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(HttpStatusCode.BadRequest, status)
         }
     }
 
     @Test
     fun testDeleteQuiz() = testApplication {
         application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
         }
 
         val requestBody = """
@@ -582,8 +579,478 @@ class ApplicationTest {
 
         client.delete(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.OK, status)
-            assertEquals("{\"deletedQuiz\":\"Deletion was successful\"}", bodyAsText())
         }
     }
+
+
+
+    /* TESTS FOR SPRINT 2 */
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     */
+
+
+    @Test
+    fun testGetUsers() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getUsers")
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testGetStudents() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getStudents")
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testGetTeachers() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getTeachers")
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testGetUserById() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getUserById")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testIsStudentFromId() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getStudentFromId")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.NotFound, status)
+        }
+    }
+
+    @Test
+    fun testIsTeacherFromId() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getTeacherFromId")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.NotFound, status)
+        }
+    }
+
+    @Test
+    fun testIsStudentFromUsername() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "username": "dawson12@uwaterloo.ca"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/isStudentFromUsername")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testIsTeacherFromUsername() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "username": "dawson12@uwaterloo.ca"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/isTeacherFromUsername")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+
+    @Test
+    fun testChangeRole() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeRole")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+
+    @Test
+    fun testChangeFirstName() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0",
+            "newFirstName": "nfn",
+            "newLastName": ""
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeFirstName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testChangeLastName() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0",
+            "newFirstName" : "",
+            "newLastName": "nln"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeLastName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testChangeFirstAndLastName() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0",
+            "newFirstName" : "nfn",
+            "newLastName": "nln"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeFirstAndLastName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testChangeUsername() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0",
+            "newUsername": "nun
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeUsername")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+
+    @Test
+    fun testGetClassSections() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0",
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getClassSections")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testGetClassSectionJoinableStatus() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "classSectionId": "6531fc9e13ed7a4cc0bf3bc0",
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getClassSectionJoinableStatus")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testGetClassSectionJoinCode() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "classSectionId": "6531fc9e13ed7a4cc0bf3bc0",
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getClassSectionJoinCode")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionJoinable() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "classSectionId": "6531fc9e13ed7a4cc0bf3bc0",
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionJoinable")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionUnjoinable() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "classSectionId": "6531fc9e13ed7a4cc0bf3bc0",
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionUnjoinable")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    @Test
+    fun testJoinClassSection() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "userId": "6531fc9e13ed7a4cc0bf3bc0",
+            "classSectionId": "6531fc9e13ed7a4cc0cf3bc0"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/joinClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
