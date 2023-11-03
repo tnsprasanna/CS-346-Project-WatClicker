@@ -26,17 +26,12 @@ fun Route.createLecture(
     lectureDataSource: LectureDataSource,
     ) {
     post("createLecture") {
-        //call.respond(HttpStatusCode.OK, "Lecture !")
-        println("HI3!!!!!!!!!!!!!")
-
         val request = kotlin.runCatching { call.receiveNullable<LectureRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
 
         val areFieldsBlank = request.name.isBlank();
-
-        //val existingUser = lectureDataSource.getLectureByName(request.name)
 
         if (areFieldsBlank) { // All user fields must be filled in
             call.respond(HttpStatusCode.Conflict, "Some fields are blank!");
@@ -48,14 +43,12 @@ fun Route.createLecture(
             teacherId = ObjectId(request.teacherId),
             joinCode = (1..8).map { ('a'..'z').random() }.joinToString(""),
             isJoinable = false,
-            active = true,
-            quizIds = emptyList(),
-            studentIds = emptyList()
-
+            isActive = true,
+            quizIds = mutableListOf<ObjectId>(),
+            studentIds = mutableListOf<ObjectId>()
             );
-        println("HI-outside1!!!!!!!!!!!!!")
+
         val wasAcknowledged = lectureDataSource.createLecture(lecture)
-        println("HI-outside2!!!!!!!!!!!!!")
 
         if (!wasAcknowledged) { // Error inserting new user into DB
             call.respond(HttpStatusCode.Conflict, "Unable to create lecture! Database Error.");

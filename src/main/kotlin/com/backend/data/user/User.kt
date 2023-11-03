@@ -11,5 +11,5 @@ data class User(
     var role: String,
     var firstname: String,
     var lastname: String,
-    var classSectionList: List<ObjectId>,
+    var classSectionList: MutableList<ObjectId>,
 )

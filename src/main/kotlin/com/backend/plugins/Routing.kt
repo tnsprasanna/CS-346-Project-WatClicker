@@ -38,7 +38,6 @@ fun Application.configureRouting(
         signUp(userDataSource, hashingService)
         authenticate()
         getSecretInfo(userDataSource)
-        getClassSections()
         getUsers(userDataSource)
         getStudents(userDataSource)
         getTeachers(userDataSource)
@@ -64,8 +63,8 @@ fun Application.configureRouting(
         getQuizzes(quizDataSource)
         createLecture(lectureDataSource)
         deleteLecture(lectureDataSource)
-
         getClassSections(userDataSource, lectureDataSource)
+
         getClassSectionJoinableStatus(lectureDataSource)
         getClassSectionJoinCode(lectureDataSource)
         makeClassSectionJoinable(lectureDataSource)

@@ -20,6 +20,7 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.bson.types.ObjectId
 
 fun Route.signUp(
     userDataSource: UserDataSource,
@@ -64,7 +65,7 @@ fun Route.signUp(
             role = request.role,
             firstname = request.firstname,
             lastname = request.lastname,
-            classSectionList = emptyList(),
+            classSectionList = mutableListOf<ObjectId>(),
         );
 
         // Try to insert new user into DB

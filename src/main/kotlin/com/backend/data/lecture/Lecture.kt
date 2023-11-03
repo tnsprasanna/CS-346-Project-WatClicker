@@ -4,11 +4,11 @@ import org.bson.types.ObjectId
 data class Lecture(
     @BsonId val id: ObjectId = ObjectId(),
 
-    val name: String,
-    val active: Boolean,
-    val studentIds: List<ObjectId>,
-    val teacherId: ObjectId,
-    val quizIds: List<ObjectId>,
-    val joinCode: String,
-    val isJoinable: Boolean
+    var name: String,
+    var isActive: Boolean,
+    var studentIds: MutableList<ObjectId>,
+    var teacherId: ObjectId,
+    var quizIds: MutableList<ObjectId>,
+    var joinCode: String,
+    var isJoinable: Boolean
 )
