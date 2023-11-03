@@ -24,4 +24,8 @@ interface LectureDataSource {
 
     suspend fun addQuizToClassSection(lectureId: String, quizId: String): Boolean
 
+    suspend fun getLectureQuizzes(lectureId: ObjectId): Boolean
+
+    suspend fun getClassSectionQuizzes(classSectionId: String): MutableList<String>
+
 }

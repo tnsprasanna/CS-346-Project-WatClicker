@@ -91,4 +91,24 @@ class MongoLectureDataSource(
             false
         }
     }
+
+    /*override suspend fun getLectureQuizzes(lectureId: String): Lecture? {
+        val filter = Filters.eq("lectureId", lectureId)
+        return lectures.find(filter).first();
+    }
+
+     */
+
+
+    override suspend fun getLectureQuizzes(lectureId: ObjectId): Boolean {
+        val lecture = lectures.findOneById(lectureId)?: return false
+        val filter = Filters.eq("lectureId", lectureId)
+        return false
+    }
+
+    override suspend fun getClassSectionQuizzes(classSectionId: String): MutableList<String> {
+        val lecture = lectures.findOneById(ObjectId(classSectionId))?: return mutableListOf("Item1", "Item2", "Item3")
+        return lecture.quizIds
+    }
+
 }

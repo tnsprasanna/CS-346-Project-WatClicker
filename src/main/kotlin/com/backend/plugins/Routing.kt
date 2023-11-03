@@ -68,6 +68,7 @@ fun Application.configureRouting(
         createLecture(lectureDataSource)
         deleteLecture(lectureDataSource)
         getClassSections(userDataSource, lectureDataSource)
+        getLectureQuizzes(lectureDataSource)
 
         getClassSectionJoinableStatus(lectureDataSource)
         getClassSectionJoinCode(lectureDataSource)
