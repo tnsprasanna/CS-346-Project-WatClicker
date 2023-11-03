@@ -21,6 +21,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import com.backend.data.lecture.LectureDataSource
 
+
 fun Application.configureRouting(
     userDataSource: UserDataSource,
     questionDataSource: QuestionDataSource,
@@ -59,6 +60,7 @@ fun Application.configureRouting(
         changeUsername(userDataSource)
         getQuizzes(quizDataSource)
         createLecture(lectureDataSource)
+        deleteLecture(lectureDataSource)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")
