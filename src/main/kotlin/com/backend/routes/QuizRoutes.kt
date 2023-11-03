@@ -2,6 +2,7 @@ package com.backend.routes
 
 import Quiz
 import com.backend.data.Constants
+import com.backend.data.lecture.LectureDataSource
 import com.backend.data.questions.QuestionDataSource
 import com.backend.data.quiz.QuizDataSource
 import com.backend.data.requests.*
@@ -16,7 +17,7 @@ import org.bson.types.ObjectId
 import java.lang.constant.ConstantDescs.NULL
 import java.util.UUID
 
-fun Route.createQuiz(quizDataSource: QuizDataSource, questionDataSource: QuestionDataSource) {
+fun Route.createQuiz(quizDataSource: QuizDataSource, questionDataSource: QuestionDataSource, lectureDataSource: LectureDataSource) {
     post("createQuiz") {
         val request = kotlin.runCatching { call.receiveNullable<QuizRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
@@ -49,8 +50,20 @@ fun Route.createQuiz(quizDataSource: QuizDataSource, questionDataSource: Questio
                 questionIds = request.questionIds,
                 lectureId = ObjectId(request.lectureId)
             );
+
+
+
+
             // Try to insert new user into DB
             val wasAcknowledged = quizDataSource.createQuiz(quiz);
+        println("titanic")
+        println(quizId)
+        val classSectionAdd = lectureDataSource.addQuizToClassSection(request.lectureId, quizId)
+        if (!classSectionAdd) {
+            call.respond(HttpStatusCode.BadRequest, "Couldn't add quiz to class!")
+            return@post
+        }
+
 
             if (!wasAcknowledged) { // Error inserting new user into DB
                 call.respond(HttpStatusCode.Conflict, "Unable to create quiz. Database Error.");

@@ -22,4 +22,6 @@ interface LectureDataSource {
 
     suspend fun addStudentToClassSection(classSectionId: String, studentId: String): Boolean
 
+    suspend fun addQuizToClassSection(lectureId: String, quizId: String): Boolean
+
 }

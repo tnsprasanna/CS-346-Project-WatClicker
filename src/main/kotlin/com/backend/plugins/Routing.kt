@@ -40,7 +40,7 @@ fun Application.configureRouting(
         getStudents(userDataSource)
         getTeachers(userDataSource)
         addQuestion(questionDataSource, hashingService)
-        createQuiz(quizDataSource, questionDataSource)
+        createQuiz(quizDataSource, questionDataSource, lectureDataSource)
         getQuestion(questionDataSource, hashingService)
         deleteQuestion(questionDataSource, hashingService)
         getQuizQuestions(quizDataSource)

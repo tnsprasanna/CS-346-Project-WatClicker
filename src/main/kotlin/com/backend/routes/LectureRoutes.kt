@@ -44,7 +44,7 @@ fun Route.createLecture(
             joinCode = (1..8).map { ('a'..'z').random() }.joinToString(""),
             isJoinable = false,
             isActive = true,
-            quizIds = mutableListOf<ObjectId>(),
+            quizIds = mutableListOf<String>(),
             studentIds = mutableListOf<ObjectId>()
             );
 

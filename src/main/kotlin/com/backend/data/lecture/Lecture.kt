@@ -8,7 +8,7 @@ data class Lecture(
     var isActive: Boolean,
     var studentIds: MutableList<ObjectId>,
     var teacherId: ObjectId,
-    var quizIds: MutableList<ObjectId>,
+    var quizIds: MutableList<String>,
     var joinCode: String,
     var isJoinable: Boolean
 )

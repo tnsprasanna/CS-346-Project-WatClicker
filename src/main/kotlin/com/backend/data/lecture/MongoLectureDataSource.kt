@@ -45,6 +45,21 @@ class MongoLectureDataSource(
         return result
     }
 
+
+    override suspend fun addQuizToClassSection(lectureId: String, quizId: String): Boolean {
+        val lecture = lectures.findOneById(ObjectId(lectureId))?: return false
+        println("TESTSINEHA")
+        return try {
+            println("TESTSINEHA5")
+            lecture.quizIds.add(quizId)
+            println("TESTSINEHA2")
+            lectures.updateOneById(ObjectId(lectureId), lecture).wasAcknowledged()
+        } catch (ex: Exception) {
+            println("TESTSINEHA3")
+            false
+        }
+    }
+
     override suspend fun getClassSectionJoinCode(classSectionId: String): String {
         val lecture = lectures.findOneById(ObjectId(classSectionId))?: return "err"
         return lecture.joinCode
