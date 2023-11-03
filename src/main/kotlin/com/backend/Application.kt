@@ -47,32 +47,3 @@ fun Application.module() {
     configureSecurity(tokenConfig)
     configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource)
 }
-
-/*
-- signup - DONE
-- login - DONE
-- are they a teacher/student - DONE
-- getQuestions for a quiz - DONE
-
-
-- teacher can createQuiz - VERIFY IT'S A TEACHER - VIPASHA
-
-- teacher can create new class  - SINEHA
-- get classes for student and teacher - DONE BUT NEEDS TESTING
-
-- getJoinableStatus
-- teacher can make class joinable or unjoinable
-- teacher can get join code
-
-- allow students to join class using a join code
-
-
-
-
-
-- get quizlist for a class
-
-- student submit their quiz answers
-- change quiz states DONE
-- get quiz state
-*/
