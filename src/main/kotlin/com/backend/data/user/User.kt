@@ -5,10 +5,11 @@ import org.bson.types.ObjectId
 
 data class User(
     @BsonId val id: ObjectId =  ObjectId(),
-    val username: String,
+    var username: String,
     val password: String,
     val salt: String,
-    val role: String,
-    val firstname: String,
-    val lastname: String
+    var role: String,
+    var firstname: String,
+    var lastname: String,
+    var classSectionList: List<ObjectId>,
 )
