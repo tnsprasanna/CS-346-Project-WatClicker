@@ -2,10 +2,10 @@ package com.backend.routes
 
 import Quiz
 import com.backend.data.Constants
-import com.backend.data.questions.Question
 import com.backend.data.questions.QuestionDataSource
 import com.backend.data.quiz.QuizDataSource
 import com.backend.data.requests.*
+import com.backend.data.requests.GetQuizQuestionIdsRequest
 import com.backend.data.responses.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -13,6 +13,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.bson.types.ObjectId
+import java.lang.constant.ConstantDescs.NULL
+import java.util.UUID
 
 fun Route.createQuiz(quizDataSource: QuizDataSource, questionDataSource: QuestionDataSource) {
     post("createQuiz") {
@@ -31,19 +33,20 @@ fun Route.createQuiz(quizDataSource: QuizDataSource, questionDataSource: Questio
                 return@post;
             }
 
-        for (questionId in request.questions) {
-            if (!ObjectId.isValid(questionId) || questionDataSource.getQuestion(questionId) == null) {
+        // check that question id exists
+        for (questionId in request.questionIds) {
+            if (questionDataSource.getQuestion(questionId) == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid question selected.")
                 return@post
             }
         }
 
-            // check that question id exists
-
+            val quizId =  UUID.randomUUID().toString();
             val quiz = Quiz(
+                quizId = quizId,
                 name = request.name,
                 state = request.state,
-                questions = request.questions
+                questionIds = request.questionIds
             );
             // Try to insert new user into DB
             val wasAcknowledged = quizDataSource.createQuiz(quiz);
@@ -53,20 +56,20 @@ fun Route.createQuiz(quizDataSource: QuizDataSource, questionDataSource: Questio
                 return@post
             }
 
-            call.respond(HttpStatusCode.OK, "Quiz Created!");
+            call.respond(HttpStatusCode.OK, "${quizId} Quiz Created!");
 
         }
     }
 
 
-fun Route.getQuiz(quizDataSource: QuizDataSource) { //maybe getQuestions
-    get("getQuiz") {
-        val request = kotlin.runCatching { call.receiveNullable<GetQuizRequest>() }.getOrNull() ?: kotlin.run {
+fun Route.getQuizQuestions(quizDataSource: QuizDataSource) { //maybe getQuestions
+    get("getQuizQuestions") {
+        val request = kotlin.runCatching { call.receiveNullable<GetQuizQuestionIdsRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@get
         }
 
-        val quiz = quizDataSource.getQuiz(request.quizId)
+        val quiz = quizDataSource.getQuizQuestions(request.quizId)
 
         if (quiz != null) {
             if (quiz.state == Constants.CLOSED || quiz.state == Constants.HIDDEN) {
@@ -80,7 +83,7 @@ fun Route.getQuiz(quizDataSource: QuizDataSource) { //maybe getQuestions
         }
 
         if (quiz != null) {
-            call.respond(HttpStatusCode.OK, GetQuizResponse(quiz.questions))
+            call.respond(HttpStatusCode.OK, GetQuizQuestionIdsResponse(questionIds = quiz.questionIds))
         }
     }
 }
@@ -101,17 +104,37 @@ fun Route.changeState(quizDataSource: QuizDataSource) {
 fun Route.deleteQuiz(quizDataSource: QuizDataSource) {
     delete("deleteQuiz") {
         val request = kotlin.runCatching { call.receiveNullable<DeleteQuizRequest>() }.getOrNull() ?: kotlin.run {
+            println()
             call.respond(HttpStatusCode.BadRequest)
             return@delete
         }
 
         val quiz = quizDataSource.deleteQuiz(request.quizId)
 
-        call.respond(HttpStatusCode.OK, DeleteQuizResponse("Deletion is successful"))
+        call.respond(HttpStatusCode.OK, DeleteQuizResponse("${request.quizId} has been deleted"))
 
     }
 }
 
+fun Route.getQuizzes(quizDataSource: QuizDataSource) {
+    get("getQuizzes") {
+        val quizzes = quizDataSource.getQuizzes();
+        val quizIds = mutableListOf<String>();
+
+        if (quizzes == NULL) {
+            call.respond(HttpStatusCode.Conflict, "List of quizzes returned null")
+        }
+        else if (quizzes.isEmpty()) {
+            call.respond(HttpStatusCode.Conflict, "No quizzes available")
+        }
+
+        quizzes.forEach{
+            quiz ->  quizIds.add(quiz.name)
+        }
+
+        call.respond(HttpStatusCode.OK, GetQuizzesResponse(quizIds))
+    }
+}
 
 fun Route.getQuizAnswersForStudent(
     quizDataSource: QuizDataSource,
@@ -126,7 +149,7 @@ fun Route.getQuizAnswersForStudent(
         val quizId = request.quizId;
         val studentId = request.studentId;
 
-        val quiz = quizDataSource.getQuiz(quizId);
+        val quiz = quizDataSource.getQuizQuestions(quizId);
 
         if (quiz == null) {
             call.respond(HttpStatusCode.BadRequest, "No such quiz exists")
@@ -136,14 +159,14 @@ fun Route.getQuizAnswersForStudent(
             return@get
         }
 
-        val questions = quiz.questions;
+        val questions = quiz.questionIds;
 
         val questionList: MutableList<GetQuizAnswersForStudentResponse> = mutableListOf();
 
         for (question in questions) {
             val q = questionDataSource.getQuestion(question);
             if (q != null) {
-                val qr = GetQuizAnswersForStudentResponse(q.id.toString(), q.question, q.options, q.responses, q.answer)
+                val qr = GetQuizAnswersForStudentResponse(q.questionId, q.question, q.options, q.responses, q.answer)
                 questionList.add(qr);
             }
         }

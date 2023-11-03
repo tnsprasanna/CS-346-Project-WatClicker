@@ -1,10 +1,6 @@
-import org.bson.codecs.pojo.annotations.BsonId
-import org.bson.types.ObjectId
-
-
-data class Quiz (
-    @BsonId val id: ObjectId = ObjectId(),
+data class Quiz(
+    val quizId: String = String.toString(),
     val name: String,
     val state: String,
-    val questions: Array<String>
+    val questionIds: Array<String> = emptyArray()
 )
