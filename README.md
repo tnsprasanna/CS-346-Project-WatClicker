@@ -10,9 +10,13 @@ Open the app on IntelliJ and then use the play button to run the application.
 
 ## Team Members
 Vipasha Gupta - v56gupta@uwaterloo.ca
+
 Prasanna Thallapalli - pthallap@uwaterloo.ca
+
 Tracy Dong - t24dong@uwaterloo.ca
+
 Sineha Manivannan - s3maniva@uwaterloo.ca
+
 Saikrishna Tadepalli - stadepal@uwaterloo.ca
 
 ## Tasks completed for Sprint 1
@@ -32,14 +36,16 @@ iClicker App:
 
 ## Project Documents
 Project proposal: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Project-Proposal
+
 Meeting minutes: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Meeting-Minutes
 
 ## Software Releases
 Release for sprint 1: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sprint1
+
 Release for Sprint 2: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sprint2
 
 
-##Link to frontend repository
+## Link to frontend repository
 https://git.uwaterloo.ca/v56gupta1/cs346-frontend
 
 ## License
