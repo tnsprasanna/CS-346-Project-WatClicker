@@ -62,6 +62,13 @@ fun Application.configureRouting(
         createLecture(lectureDataSource)
         deleteLecture(lectureDataSource)
 
+        getClassSections(userDataSource, lectureDataSource)
+        getClassSectionJoinableStatus(lectureDataSource)
+        getClassSectionJoinCode(lectureDataSource)
+        makeClassSectionJoinable(lectureDataSource)
+        makeClassSectionUnjoinable(lectureDataSource)
+        joinClassSection(userDataSource, lectureDataSource)
+
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")
         }

@@ -167,5 +167,3 @@ fun Route.getSecretInfo(
     }
 }
 
-
-

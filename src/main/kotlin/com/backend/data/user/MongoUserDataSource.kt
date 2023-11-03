@@ -33,7 +33,7 @@ class MongoUserDataSource(
     }
 
     override suspend fun getUsers(): List<User> {
-        return  users.find().toList();
+        return users.find().toList();
     }
 
     override suspend fun getTeachers(): List<User> {

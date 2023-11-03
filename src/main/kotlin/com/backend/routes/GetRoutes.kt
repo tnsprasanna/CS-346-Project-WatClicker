@@ -3,12 +3,11 @@ package com.backend.routes
 import User
 import com.backend.data.user.UserDataSource
 import com.backend.data.Constants
+import com.backend.data.lecture.LectureDataSource
 import com.backend.data.requests.SignInRequest
-import com.backend.data.responses.AuthResponse
 import com.backend.data.requests.UserIdRequest
 import com.backend.data.requests.UsernameRequest
-import com.backend.data.responses.UserListResponse
-import com.backend.data.responses.UserResponse
+import com.backend.data.responses.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -256,3 +255,127 @@ fun Route.changeUsername(
         call.respond(HttpStatusCode.NoContent, "Not yet implemented")
     }
 }
+
+
+
+
+/*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+fun Route.getClassSections(
+    userDataSource: UserDataSource,
+    lectureDataSource: LectureDataSource
+) {
+    get("getClassSections") {
+        val request = kotlin.runCatching { call.receiveNullable<UserIdRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest, "Couldn't parse params!")
+            return@get
+        }
+
+        val user = userDataSource.getUserById(request.userId)?: kotlin.run {
+            call.respond(HttpStatusCode.Conflict, "user not found")
+            return@get
+        }
+
+//        val classSectionObjsList = user.classSectionList.map {
+//            lectureDataSource.getClassSectionById(it)
+//        };
+//
+//        val classSectionRespList = classSectionObjsList.map {c -> ClassSectionResponse(
+//            c.id.toString(),
+//            c.name,
+//            c.teacherId.toString(),
+//            c.studentIds.map { it.toString() },
+//            c.isActive,
+//            c.quizIds.map { it.toString() },
+//            c.joinCode,
+//            c.isJoinable
+//        )}
+//
+//        call.respond(
+//            status = HttpStatusCode.OK,
+//            message = ClassSectionListResponse(classSectionRespList)
+//        )
+    }
+}
+
+fun Route.getClassSectionJoinableStatus( // READ FROM CLASS OBJECT
+    lectureDataSource: LectureDataSource
+) {
+    get("getClassSectionJoinableStatus") {
+        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+    }
+}
+
+fun Route.getClassSectionJoinCode( // READ FROM CLASS OBJECT
+    lectureDataSource: LectureDataSource
+) {
+    get("getClassSectionJoinCode") {
+        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+    }
+}
+
+fun Route.makeClassSectionJoinable(
+    lectureDataSource: LectureDataSource
+){
+    post("makeClassSectionJoinable") {
+        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+    }
+}
+
+fun Route.makeClassSectionUnjoinable(
+    lectureDataSource: LectureDataSource
+) {
+    post("makeClassSectionJoinable") {
+        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+    }
+}
+
+fun Route.joinClassSection(
+    userDataSource: UserDataSource,
+    lectureDataSource: LectureDataSource
+) {
+    post("joinClassSection") {
+        call.respond(HttpStatusCode.NoContent, "Not yet implemented")
+    }
+}
+
