@@ -36,6 +36,7 @@ Meeting minutes: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Meeting-Mi
 
 ## Software Releases
 Release for sprint 1: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sprint1
+Release for Sprint 2: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sprint2
 
 ## License
 For open source projects, say how it is licensed.
