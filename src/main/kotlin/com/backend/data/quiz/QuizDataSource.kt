@@ -7,6 +7,8 @@ interface QuizDataSource {
 
         suspend fun getQuizzes(): List<Quiz>
 
+        suspend fun getQuizById(quizId: String): Quiz?
+
         suspend fun changeState(quizId: String, newState: String): String
 
         suspend fun createQuiz(quiz: Quiz): Boolean

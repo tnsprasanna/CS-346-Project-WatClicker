@@ -53,6 +53,7 @@ fun Application.configureRouting(
         getQuizQuestions(quizDataSource)
         changeState(quizDataSource)
         deleteQuiz(quizDataSource)
+        getQuizById(quizDataSource)
         getUserById(userDataSource)
         isStudentFromId(userDataSource)
         isStudentFromUsername(userDataSource)

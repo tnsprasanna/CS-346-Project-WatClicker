@@ -20,6 +20,10 @@ class MongoQuizDataSource(
         return quizzes.find().toList();
     }
 
+    override suspend fun getQuizById(quizId: String): Quiz? {
+        val filter = Filters.eq("quizId", quizId)
+        return quizzes.find(filter).first();
+    }
     override suspend fun changeState(quizId: String, newState: String): String {
         val filter = Filters.eq("quizId", quizId)
         val update = Updates.set(Quiz::state.name, newState)

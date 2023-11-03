@@ -102,6 +102,30 @@ fun Route.getQuizQuestions(quizDataSource: QuizDataSource) { //maybe getQuestion
     }
 }
 
+fun Route.getQuizById(quizDataSource: QuizDataSource) { //maybe getQuestions
+    get("getQuizById") {
+        val request = kotlin.runCatching { call.receiveNullable<GetQuizQuestionIdsRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@get
+        }
+
+        val quiz = quizDataSource.getQuizById(request.quizId)
+
+        if (quiz == null) {
+            call.respond(HttpStatusCode.Conflict, "Quiz is NULL")
+            return@get
+        }
+        val q = GetQuizByIdResponse(
+            quizId = quiz.quizId,
+            name = quiz.name,
+            state = quiz.state,
+            questionIds = quiz.questionIds,
+            lectureId = quiz.lectureId.toString()
+        )
+        call.respond(HttpStatusCode.OK, q)
+    }
+}
+
 fun Route.changeState(quizDataSource: QuizDataSource) {
     patch("changeState") {
         val request = kotlin.runCatching { call.receiveNullable<ChangeStateRequest>() }.getOrNull() ?: kotlin.run {
