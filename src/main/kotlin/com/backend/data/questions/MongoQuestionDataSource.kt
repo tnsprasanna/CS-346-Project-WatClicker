@@ -1,6 +1,7 @@
 package com.backend.data.questions
 
 import com.backend.data.user.UserDataSource
+import com.mongodb.client.model.Filters
 import org.bson.types.ObjectId
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
@@ -14,11 +15,13 @@ class MongoQuestionDataSource(
     }
 
     override suspend fun getQuestion(questionId: String): Question? {
-        return questions.findOneById(ObjectId(questionId))
+        val filter = Filters.eq("questionId", questionId)
+        return questions.findOne(filter);
     }
 
     override suspend fun deleteQuestion(questionId: String): Boolean {
-        val result = questions.deleteOneById(ObjectId(questionId))
+        val filter = Filters.eq("questionId", questionId)
+        val result = questions.deleteOne(filter)
         return result.wasAcknowledged()
     }
 }
