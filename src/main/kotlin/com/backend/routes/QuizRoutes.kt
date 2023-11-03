@@ -18,7 +18,7 @@ import java.util.UUID
 
 fun Route.createQuiz(quizDataSource: QuizDataSource, questionDataSource: QuestionDataSource) {
     post("createQuiz") {
-        val request = kotlin.runCatching { call.receiveNullable<QuizRequest>() }.getOrNull() ?: kotlin.run {
+        val request = kotlin.runCatching { call.receiveNullable<CreateQuizRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }

@@ -3,7 +3,7 @@ package com.backend.data.requests
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class QuizRequest (
+data class CreateQuizRequest (
     val name: String,
     // must be one of HIDDEN | OPEN | CLOSED | FINISHED
     val state: String,

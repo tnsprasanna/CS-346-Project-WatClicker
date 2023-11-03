@@ -20,6 +20,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import com.backend.data.lecture.LectureDataSource
+import com.backend.data.selection.SelectionDataSource
 
 
 fun Application.configureRouting(
@@ -29,7 +30,8 @@ fun Application.configureRouting(
     hashingService: HashingService,
     tokenService: TokenService,
     tokenConfig: TokenConfig,
-    lectureDataSource: LectureDataSource
+    lectureDataSource: LectureDataSource,
+    selectionDataSource: SelectionDataSource
 ) {
     routing {
         signIn(userDataSource, hashingService, tokenService, tokenConfig)
@@ -39,10 +41,11 @@ fun Application.configureRouting(
         getUsers(userDataSource)
         getStudents(userDataSource)
         getTeachers(userDataSource)
-        addQuestion(questionDataSource, hashingService)
+        addQuestion(questionDataSource)
         createQuiz(quizDataSource, questionDataSource)
-        getQuestion(questionDataSource, hashingService)
-        deleteQuestion(questionDataSource, hashingService)
+        getQuestion(questionDataSource)
+        deleteQuestion(questionDataSource)
+        addSelectionToQuestion(questionDataSource, selectionDataSource)
         getQuizQuestions(quizDataSource)
         changeState(quizDataSource)
         deleteQuiz(quizDataSource)
@@ -67,6 +70,11 @@ fun Application.configureRouting(
         makeClassSectionJoinable(lectureDataSource)
         makeClassSectionUnjoinable(lectureDataSource)
         joinClassSection(userDataSource, lectureDataSource)
+
+        createSelection(selectionDataSource, questionDataSource, userDataSource)
+        deleteSelection(selectionDataSource)
+        editSelection(selectionDataSource, questionDataSource)
+        getSelectionById(selectionDataSource)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")
