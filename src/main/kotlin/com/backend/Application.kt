@@ -46,3 +46,23 @@ fun Application.module() {
     configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig)
 }
 
+/*
+- signup - DONE
+- login - DONE
+- are they a teacher/student - DONE
+- getQuestions for a quiz - DONE
+
+- teacher can createQuiz - VERIFY IT'S A TEACHER
+
+- get classes for student and teacher
+- teacher can create new class
+- teacher can make class joinable or unjoinable
+- teacher can get join code
+- allow students to join class using a join code
+
+- get quizlist for a class
+
+- student submit their quiz answers
+- change quiz states DONE
+- get quiz state
+*/

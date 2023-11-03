@@ -1,8 +1,11 @@
 package com.backend.data.user
 
 import User
+import org.bson.codecs.pojo.annotations.BsonId
 
 interface UserDataSource {
+    suspend fun getUserById(userId: String): User?
+
     suspend fun getUserByUsername(username: String): User?
 
     suspend fun insertUser(user: User): Boolean
@@ -13,11 +16,25 @@ interface UserDataSource {
 
     suspend fun getStudents(): List<User>
 
+    suspend fun isStudentFromId(userId: String): Boolean
 
+    suspend fun isStudentFromUsername(username: String): Boolean
 
-    // Get User by ID
+    suspend fun isTeacherFromId(userId: String): Boolean
 
-    // Update User
+    suspend fun isTeacherFromUsername(username: String): Boolean
 
-    // Delete User
+    suspend fun deleteUser(userId: String): Boolean
+
+    suspend fun changeRole(userId: String, newRole: String): Boolean
+
+    suspend fun changeFirstName(userId: String, newFirstName: String): Boolean
+
+    suspend fun changeLastName(userId: String, newLastName: String): Boolean
+
+    suspend fun changeFirstAndLastName(userId: String, newFirstName: String, newLastName: String): Boolean
+
+    suspend fun changeUsername(userId: String, newUsername: String): Boolean
+
+    suspend fun changePassword(userId: String, newPassword: String): Boolean
 }

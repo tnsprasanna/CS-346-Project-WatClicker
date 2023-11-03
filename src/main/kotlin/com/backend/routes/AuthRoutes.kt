@@ -5,6 +5,8 @@ import com.backend.data.Constants
 import com.backend.data.requests.SignInRequest
 import com.backend.data.requests.SignUpRequest
 import com.backend.data.responses.AuthResponse
+import com.backend.data.responses.UserListResponse
+import com.backend.data.responses.UserResponse
 import com.backend.data.user.UserDataSource
 import com.backend.security.hashing.HashingService
 import com.backend.security.hashing.SaltedHash
@@ -61,7 +63,8 @@ fun Route.signUp(
             salt = saltedHash.salt,
             role = request.role,
             firstname = request.firstname,
-            lastname = request.lastname
+            lastname = request.lastname,
+            classSectionList = emptyList(),
         );
 
         // Try to insert new user into DB
@@ -132,13 +135,37 @@ fun Route.authenticate() {
     }
 }
 
-fun Route.getSecretInfo() {
+fun Route.getSecretInfo(
+    userDataSource: UserDataSource
+) {
     authenticate {
         get("secret") {
             val principal = call.principal<JWTPrincipal>()
+
             val userId = principal?.getClaim("userId", String::class)
-            call.respond(HttpStatusCode.OK, "Your userId is $userId")
+            if (userId == null) {
+                call.respond(HttpStatusCode.Conflict, "UserId not retrievable!");
+                return@get
+            }
+
+            val user = userDataSource.getUserById(userId)
+            if (user == null) {
+                call.respond(HttpStatusCode.Conflict, "User not sound!");
+                return@get
+            }
+
+            call.respond(
+                status = HttpStatusCode.OK,
+                message = UserResponse(user.id.toString(),
+                    user.username,
+                    user.role,
+                    user.firstname,
+                    user.lastname,
+                    user.classSectionList.map { it.toString() })
+            )
         }
     }
 }
+
+
 
