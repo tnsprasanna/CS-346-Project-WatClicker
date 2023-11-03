@@ -105,4 +105,14 @@ class MongoUserDataSource(
     override suspend fun changePassword(userId: String, newPassword: String): Boolean {
         TODO("Not yet implemented")
     }
+
+    override suspend fun addClassSectionToStudent(studentId: String, classSectionId: String): Boolean {
+        val user = users.findOneById(ObjectId(studentId))?: return false
+        return try {
+            user.classSectionList.add(ObjectId(classSectionId))
+            users.updateOneById(ObjectId(studentId), user).wasAcknowledged()
+        } catch (ex: Exception) {
+            false
+        }
+    }
 }
