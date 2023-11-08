@@ -16,9 +16,15 @@ class MongoUserDataSource(
 ) : UserDataSource {
     private val users = db.getCollection<User>()
 
+    private fun getUserObjectId(userId: String): ObjectId? {
+        return try { ObjectId(userId) } catch (e: Exception) { null }
+    }
+
     override suspend fun getUserById(userId: String): User? {
         if (userId.isEmpty()) return null
-       return users.findOneById(ObjectId(userId))
+        val userObjectId = getUserObjectId(userId)?: return null
+
+       return users.findOneById(userObjectId)
     }
 
     override suspend fun getUserByUsername(username: String): User? {
@@ -46,7 +52,8 @@ class MongoUserDataSource(
     }
 
     override suspend fun isStudentFromId(userId: String): Boolean {
-        val user = users.findOneById(ObjectId(userId)) ?: return false;
+        val userObjectId = getUserObjectId(userId)?: return false
+        val user = users.findOneById(userObjectId)?: return false;
         return user.role == Constants.STUDENT_ROLE
     }
 
@@ -56,7 +63,8 @@ class MongoUserDataSource(
     }
 
     override suspend fun isTeacherFromId(userId: String): Boolean {
-        val user = users.findOneById(ObjectId(userId)) ?: return false;
+        val userObjectId = getUserObjectId(userId)?: return false
+        val user = users.findOneById(userObjectId)?: return false;
         return user.role == Constants.TEACHER_ROLE
     }
 
@@ -66,41 +74,58 @@ class MongoUserDataSource(
     }
 
     override suspend fun deleteUser(userId: String): Boolean {
-        return users.deleteOneById(ObjectId(userId)).wasAcknowledged()
+        val userObjectId = getUserObjectId(userId)?: return false
+        return users.deleteOneById(userObjectId).wasAcknowledged()
     }
 
     override suspend fun changeRole(userId: String, newRole: String): Boolean {
         if (newRole != Constants.TEACHER_ROLE && newRole != Constants.STUDENT_ROLE) { return false; }
 
-        val user = users.findOneById(ObjectId(userId))?: return false;
+        val userObjectId = getUserObjectId(userId)?: return false;
+        val user = users.findOneById(userObjectId)?: return false;
+
         user.role = newRole;
-        return users.updateOneById(ObjectId(userId), user).wasAcknowledged();
+
+        return users.updateOneById(userObjectId, user).wasAcknowledged();
     }
 
     override suspend fun changeFirstName(userId: String, newFirstName: String): Boolean {
-        val user = users.findOneById(ObjectId(userId))?: return false;
+        val userObjectId = getUserObjectId(userId)?: return false;
+        val user = users.findOneById(userObjectId)?: return false;
+
         user.firstname = newFirstName;
-        return users.updateOneById(ObjectId(userId), user).wasAcknowledged();
+
+        return users.updateOneById(userObjectId, user).wasAcknowledged();
     }
 
     override suspend fun changeLastName(userId: String, newLastName: String): Boolean {
-        val user = users.findOneById(ObjectId(userId))?: return false;
+        val userObjectId = getUserObjectId(userId)?: return false;
+        val user = users.findOneById(userObjectId)?: return false;
+
         user.lastname = newLastName;
-        return users.updateOneById(ObjectId(userId), user).wasAcknowledged();
+
+        return users.updateOneById(userObjectId, user).wasAcknowledged();
     }
 
     override suspend fun changeFirstAndLastName(userId: String, newFirstName: String, newLastName: String): Boolean {
-        val user = users.findOneById(ObjectId(userId))?: return false;
+        val userObjectId = getUserObjectId(userId)?: return false;
+        val user = users.findOneById(userObjectId)?: return false;
+
         user.firstname = newFirstName;
         user.lastname = newLastName;
-        return users.updateOneById(ObjectId(userId), user).wasAcknowledged();
+
+        return users.updateOneById(userObjectId, user).wasAcknowledged();
     }
 
     override suspend fun changeUsername(userId: String, newUsername: String): Boolean {
-        users.findOne(User::username eq newUsername)?: return false
-        val user = users.findOneById(ObjectId(userId))?: return false;
+        if (users.findOne(User::username eq newUsername) != null) { return false }
+
+        val userObjectId = getUserObjectId(userId)?: return false
+        val user = users.findOneById(userObjectId)?: return false;
+
         user.username = newUsername;
-        return users.updateOneById(ObjectId(userId), user).wasAcknowledged();
+
+        return users.updateOneById(userObjectId, user).wasAcknowledged();
     }
 
     override suspend fun changePassword(userId: String, newPassword: String): Boolean {
@@ -108,12 +133,11 @@ class MongoUserDataSource(
     }
 
     override suspend fun addClassSectionToStudent(studentId: String, classSectionId: String): Boolean {
-        val user = users.findOneById(ObjectId(studentId))?: return false
-        return try {
-            user.classSectionList.add(ObjectId(classSectionId))
-            users.updateOneById(ObjectId(studentId), user).wasAcknowledged()
-        } catch (ex: Exception) {
-            false
-        }
+        val userObjectId = getUserObjectId(studentId)?: return false
+        val user = users.findOneById(userObjectId)?: return false
+
+        user.classSectionList.add(userObjectId)
+
+        return users.updateOneById(userObjectId, user).wasAcknowledged()
     }
 }

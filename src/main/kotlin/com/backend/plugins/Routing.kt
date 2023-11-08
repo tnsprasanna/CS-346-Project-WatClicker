@@ -72,9 +72,9 @@ fun Application.configureRouting(
         getLectureQuizzes(lectureDataSource)
 
         getClassSectionJoinableStatus(lectureDataSource)
-        getClassSectionJoinCode(lectureDataSource)
-        makeClassSectionJoinable(lectureDataSource)
-        makeClassSectionUnjoinable(lectureDataSource)
+        getClassSectionJoinCode(lectureDataSource, userDataSource)
+        makeClassSectionJoinable(lectureDataSource, userDataSource)
+        makeClassSectionUnjoinable(lectureDataSource, userDataSource)
         joinClassSection(userDataSource, lectureDataSource)
 
         createSelection(selectionDataSource, questionDataSource, userDataSource)
