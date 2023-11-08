@@ -12,24 +12,30 @@ class MongoQuestionDataSource(
     db: CoroutineDatabase
 ) : QuestionDataSource {
     private val questions = db.getCollection<Question>()
-    override suspend fun addQuestion(question: Question): Boolean {
+
+    private fun getQuestionObjectId(questionId: String): ObjectId? {
+        return try { ObjectId(questionId) } catch (e: Exception) { null }
+    }
+
+    override suspend fun getQuestionById(questionId: String): Question? {
+        val questionObjectId = getQuestionObjectId(questionId)?: return null
+        return questions.findOneById(questionObjectId)
+    }
+
+    override suspend fun insertQuestion(question: Question): Boolean {
         return questions.insertOne(question).wasAcknowledged()
     }
 
-    override suspend fun getQuestion(questionId: String): Question? {
-        val filter = Filters.eq("questionId", questionId)
-        return questions.findOne(filter);
-    }
-
-    override suspend fun addSelectionToQuestion(questionId: String, selectionId: String): Boolean {
-        val filter = Filters.eq("questionId", questionId)
-        val update = Updates.addToSet(Question::selections.name, selectionId)
-        return questions.updateOne(filter, update).wasAcknowledged();
-    }
-
     override suspend fun deleteQuestion(questionId: String): Boolean {
-        val filter = Filters.eq("questionId", questionId)
-        val result = questions.deleteOne(filter)
-        return result.wasAcknowledged()
+        val questionObjectId = getQuestionObjectId(questionId)?: return false
+        return questions.deleteOneById(questionObjectId).wasAcknowledged()
     }
+
+
+//    override suspend fun addSelectionToQuestion(questionId: String, selectionId: String): Boolean {
+//        val filter = Filters.eq("questionId", questionId)
+//        val update = Updates.addToSet(Question::selections.name, selectionId)
+//        return questions.updateOne(filter, update).wasAcknowledged();
+//    }
+
 }

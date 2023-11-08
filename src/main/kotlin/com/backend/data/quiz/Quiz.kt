@@ -1,11 +1,12 @@
 import kotlinx.serialization.Serializable
+import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 
 
 data class Quiz(
-    val quizId: String = String.toString(),
-    val name: String,
-    val state: String,
-    val questionIds: Array<String> = emptyArray(),
-    val lectureId: ObjectId
+    @BsonId val id: ObjectId = ObjectId(),
+    var name: String,
+    var state: String,
+    val classSectionId: ObjectId,
+    var questionIds: MutableList<ObjectId>
 )

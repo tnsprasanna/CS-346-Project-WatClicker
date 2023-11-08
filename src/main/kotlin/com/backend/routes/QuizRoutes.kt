@@ -8,6 +8,7 @@ import com.backend.data.quiz.QuizDataSource
 import com.backend.data.requests.*
 import com.backend.data.requests.GetQuizQuestionIdsRequest
 import com.backend.data.responses.*
+import com.backend.data.user.UserDataSource
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -16,203 +17,247 @@ import io.ktor.server.routing.*
 import org.bson.types.ObjectId
 import java.lang.constant.ConstantDescs.NULL
 import java.util.UUID
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 
-fun Route.createQuiz(quizDataSource: QuizDataSource, questionDataSource: QuestionDataSource, lectureDataSource: LectureDataSource) {
-    post("createQuiz") {
-        val request = kotlin.runCatching { call.receiveNullable<CreateQuizRequest>() }.getOrNull() ?: kotlin.run {
-            call.respond(HttpStatusCode.BadRequest)
-            return@post
-        }
+fun Route.createQuiz(
+    userDataSource: UserDataSource,
+    lectureDataSource: LectureDataSource,
+    quizDataSource: QuizDataSource,
+) {
+    authenticate {
+        post("createQuiz") {
+            val principal = call.principal<JWTPrincipal>()
 
-            if (request.state != Constants.HIDDEN && request.state != Constants.FINISHED
-                && request.state != Constants.CLOSED && request.state != Constants.OPEN
-            ) {
-                call.respond(
-                    HttpStatusCode.Conflict,
-                    "State should be one of HIDDEN, CLOSED, FINISHED or OPEN, given state is ${request.state}"
-                )
-                return@post;
-            }
-
-        // check that question id exists
-        for (questionId in request.questionIds) {
-            if (questionDataSource.getQuestion(questionId) == null) {
-                call.respond(HttpStatusCode.BadRequest, "Invalid question selected.")
+            val userId = principal?.getClaim("userId", String::class)?: kotlin.run{
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
                 return@post
             }
-        }
 
-            val quizId =  UUID.randomUUID().toString();
+            val request = kotlin.runCatching { call.receiveNullable<CreateQuizRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@post
+            }
+
+            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@post
+            }
+
+            val classSection = lectureDataSource.getLectureByID(request.classSectionId)?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
+                return@post
+            }
+
+            if (user.role != Constants.TEACHER_ROLE) {
+                call.respond(HttpStatusCode.Conflict, "User must be a Teacher!")
+                return@post
+            }
+
+            if (classSection.teacherId.toString() != userId) {
+                call.respond(HttpStatusCode.Conflict, "User is not the teacher of this ClassSection!")
+                return@post
+            }
+
+            if (!Constants.QUIZ_STATES.contains(request.state)) {
+                call.respond(HttpStatusCode.Conflict, "Quiz state is invalid!")
+                return@post
+            }
+
             val quiz = Quiz(
-                quizId = quizId,
                 name = request.name,
                 state = request.state,
-                questionIds = request.questionIds,
-                lectureId = ObjectId(request.lectureId)
-            );
+                classSectionId = ObjectId(request.classSectionId),
+                questionIds = mutableListOf<ObjectId>()
+            )
 
-
-
-
-            // Try to insert new user into DB
-            val wasAcknowledged = quizDataSource.createQuiz(quiz);
-        println("titanic")
-        println(quizId)
-        val classSectionAdd = lectureDataSource.addQuizToClassSection(request.lectureId, quizId)
-        if (!classSectionAdd) {
-            call.respond(HttpStatusCode.BadRequest, "Couldn't add quiz to class!")
-            return@post
-        }
-
-
-            if (!wasAcknowledged) { // Error inserting new user into DB
-                call.respond(HttpStatusCode.Conflict, "Unable to create quiz. Database Error.");
+            val res = quizDataSource.insertQuiz(quiz)
+            if (!res) {
+                call.respond(HttpStatusCode.Conflict, "Unable to create quiz! Database Error.");
                 return@post
             }
 
-            call.respond(HttpStatusCode.OK, "${quizId} Quiz Created!");
-
-        }
-    }
-
-
-fun Route.getQuizQuestions(quizDataSource: QuizDataSource) { //maybe getQuestions
-    get("getQuizQuestions") {
-        val request = kotlin.runCatching { call.receiveNullable<GetQuizQuestionIdsRequest>() }.getOrNull() ?: kotlin.run {
-            call.respond(HttpStatusCode.BadRequest)
-            return@get
-        }
-
-        val quiz = quizDataSource.getQuizQuestions(request.quizId)
-
-        if (quiz != null) {
-            if (quiz.state == Constants.CLOSED || quiz.state == Constants.HIDDEN) {
-                call.respond(
-                    HttpStatusCode.Conflict,
-                    "State should be OPEN or FINISHED for questions to be visible"
-                )
-            }
-        } else {
-            call.respond(HttpStatusCode.Conflict, "Quiz is NULL")
-        }
-
-        if (quiz != null) {
-            call.respond(HttpStatusCode.OK, GetQuizQuestionIdsResponse(questionIds = quiz.questionIds))
+            call.respond(HttpStatusCode.OK, "Quiz Created!");
         }
     }
 }
 
-fun Route.getQuizById(quizDataSource: QuizDataSource) { //maybe getQuestions
+fun Route.getQuizById(
+    quizDataSource: QuizDataSource,
+) {
     get("getQuizById") {
-        val request = kotlin.runCatching { call.receiveNullable<GetQuizQuestionIdsRequest>() }.getOrNull() ?: kotlin.run {
-            call.respond(HttpStatusCode.BadRequest)
+        val request = kotlin.runCatching { call.receiveNullable<QuizIdRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
             return@get
         }
 
-        val quiz = quizDataSource.getQuizById(request.quizId)
-
-        if (quiz == null) {
-            call.respond(HttpStatusCode.Conflict, "Quiz is NULL")
+        val quiz = quizDataSource.getQuizById(request.quizId)?: kotlin.run {
+            call.respond(HttpStatusCode.Conflict, "Quiz not found!")
             return@get
         }
-        val q = GetQuizByIdResponse(
-            quizId = quiz.quizId,
+
+        val quizResponse = QuizResponse(
+            id = quiz.id.toString(),
             name = quiz.name,
             state = quiz.state,
-            questionIds = quiz.questionIds,
-            lectureId = quiz.lectureId.toString()
+            classSectionId = quiz.classSectionId.toString(),
+            questionIds = quiz.questionIds.map { it.toString() }
         )
-        call.respond(HttpStatusCode.OK, q)
+
+        call.respond(
+            status = HttpStatusCode.OK,
+            message = quizResponse
+        )
     }
 }
 
-fun Route.changeState(quizDataSource: QuizDataSource) {
-    patch("changeState") {
-        val request = kotlin.runCatching { call.receiveNullable<ChangeStateRequest>() }.getOrNull() ?: kotlin.run {
-            call.respond(HttpStatusCode.BadRequest)
-            return@patch
+fun Route.changeQuizState(
+    userDataSource: UserDataSource,
+    lectureDataSource: LectureDataSource,
+    quizDataSource: QuizDataSource
+) {
+    authenticate {
+        post("changeQuizState") {
+            val principal = call.principal<JWTPrincipal>()
+
+            val userId = principal?.getClaim("userId", String::class)?: kotlin.run{
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                return@post
+            }
+
+            val request = kotlin.runCatching { call.receiveNullable<ChangeStateRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@post
+            }
+
+            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@post
+            }
+
+            if (user.role != Constants.TEACHER_ROLE) {
+                call.respond(HttpStatusCode.Conflict, "User must be a Teacher!")
+                return@post
+            }
+
+            val quiz = quizDataSource.getQuizById(request.quizId)?: kotlin.run{
+                call.respond(HttpStatusCode.Conflict, "Quiz not found!")
+                return@post
+            }
+
+            val classSection = lectureDataSource.getLectureByID(quiz.classSectionId.toString())?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
+                return@post
+            }
+
+            if (classSection.teacherId.toString() != userId) {
+                call.respond(HttpStatusCode.Conflict, "User is not the teacher of the class that this quiz is a part of!")
+                return@post
+            }
+
+            if (!Constants.QUIZ_STATES.contains(request.newState)) {
+                call.respond(HttpStatusCode.Conflict, "Quiz newState is invalid!")
+                return@post
+            }
+
+            val res = quizDataSource.changeQuizState(request.quizId, request.newState)
+            if (!res) {
+                call.respond(HttpStatusCode.Conflict, "Unable change the quiz state!");
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, "Quiz State Changed!");
         }
-
-        val state = quizDataSource.changeState(request.quizId, request.newState)
-
-        call.respond(HttpStatusCode.OK, ChangeStateResponse(true))
     }
 }
 
-fun Route.deleteQuiz(quizDataSource: QuizDataSource) {
-    delete("deleteQuiz") {
-        val request = kotlin.runCatching { call.receiveNullable<DeleteQuizRequest>() }.getOrNull() ?: kotlin.run {
-            println()
-            call.respond(HttpStatusCode.BadRequest)
-            return@delete
+fun Route.deleteQuiz(
+    userDataSource: UserDataSource,
+    lectureDataSource: LectureDataSource,
+    quizDataSource: QuizDataSource
+) {
+    authenticate {
+        post("changeQuizState") {
+            val principal = call.principal<JWTPrincipal>()
+
+            val userId = principal?.getClaim("userId", String::class)?: kotlin.run{
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                return@post
+            }
+
+            val request = kotlin.runCatching { call.receiveNullable<QuizIdRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@post
+            }
+
+            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@post
+            }
+
+            if (user.role != Constants.TEACHER_ROLE) {
+                call.respond(HttpStatusCode.Conflict, "User must be a Teacher!")
+                return@post
+            }
+
+            val quiz = quizDataSource.getQuizById(request.quizId)?: kotlin.run{
+                call.respond(HttpStatusCode.Conflict, "Quiz not found!")
+                return@post
+            }
+
+            val classSection = lectureDataSource.getLectureByID(quiz.classSectionId.toString())?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
+                return@post
+            }
+
+            if (classSection.teacherId.toString() != userId) {
+                call.respond(HttpStatusCode.Conflict, "User is not the teacher of the class that this quiz is a part of!")
+                return@post
+            }
+
+            val res = quizDataSource.deleteQuiz(request.quizId)
+
+            if (!res) {
+                call.respond(HttpStatusCode.Conflict, "Unable to delete quiz!");
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, "Quiz State Changed!");
         }
-
-        val quiz = quizDataSource.deleteQuiz(request.quizId)
-        call.respond(HttpStatusCode.OK, DeleteQuizResponse("${request.quizId} has been deleted"))
-
     }
 }
 
-fun Route.getQuizzes(quizDataSource: QuizDataSource) {
-    get("getQuizzes") {
-        val quizzes = quizDataSource.getQuizzes();
-        val quizIds = mutableListOf<String>();
-
-        if (quizzes == NULL) {
-            call.respond(HttpStatusCode.Conflict, "List of quizzes returned null")
-        }
-        else if (quizzes.isEmpty()) {
-            call.respond(HttpStatusCode.Conflict, "No quizzes available")
-        }
-
-        quizzes.forEach{
-            quiz ->  quizIds.add(quiz.name)
-        }
-
-        call.respond(HttpStatusCode.OK, GetQuizzesResponse(quizIds))
-    }
-}
-
-fun Route.getQuizAnswersForStudent(
+fun Route.getQuizQuestions(
     quizDataSource: QuizDataSource,
     questionDataSource: QuestionDataSource
 ) {
-    get("getQuizAnswersForStudent") {
-        val request = kotlin.runCatching { call.receiveNullable<GetQuizAnswersForStudentRequest>() }.getOrNull() ?: kotlin.run {
+    get("getQuizQuestions") {
+        val request = kotlin.runCatching { call.receiveNullable<QuizIdRequest>() }.getOrNull() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@get
         }
 
-        val quizId = request.quizId;
-        val studentId = request.studentId;
-
-        val quiz = quizDataSource.getQuizQuestions(quizId);
-
-        if (quiz == null) {
-            call.respond(HttpStatusCode.BadRequest, "No such quiz exists")
-            return@get
-        } else if (quiz.state != "FINISHED") {
-            call.respond(HttpStatusCode.Conflict, "Quiz answers are not available")
+        val quiz = quizDataSource.getQuizById(request.quizId)?: kotlin.run {
+            call.respond(HttpStatusCode.Conflict, "Quiz not found!")
             return@get
         }
 
-        val questions = quiz.questionIds;
+        val quizQuestionObjsList = quizDataSource.getQuizQuestions(request.quizId).filterNotNull();
 
-        val questionList: MutableList<GetQuizAnswersForStudentResponse> = mutableListOf();
-
-        for (question in questions) {
-            val q = questionDataSource.getQuestion(question);
-            if (q != null) {
-                val qr = GetQuizAnswersForStudentResponse(q.questionId, q.question, q.options, q.responses, q.answer)
-                questionList.add(qr);
-            }
+        val quizQuestionsRespList = quizQuestionObjsList.map {
+            q -> QuestionResponse(
+                id = q.id.toString(),
+                question = q.question,
+                options = q.options,
+                responses = q.responses,
+                answer = q.answer,
+                selections = q.selections.map{ it.toString() },
+            )
         }
-
-        val response = GetQuizAnswersForStudentListResponse(questionList)
 
         call.respond(
-            HttpStatusCode.OK,
-            message = response
+            status = HttpStatusCode.OK,
+            message = QuestionListResponse(quizQuestionsRespList)
         )
     }
 }

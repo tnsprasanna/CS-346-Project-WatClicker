@@ -1,41 +1,106 @@
 package com.backend.data.quiz
 
 import Quiz
+import com.backend.data.Constants
+import com.backend.data.questions.Question
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import org.bson.types.ObjectId
+import org.litote.kmongo.coroutine.insertOne
 
 class MongoQuizDataSource(
     db: CoroutineDatabase
 ) : QuizDataSource {
     private val quizzes = db.getCollection<Quiz>()
+    private val questions = db.getCollection<Question>()
+    private fun getQuizObjectId(quizId: String): ObjectId? {
+        return try { ObjectId(quizId) } catch (e: Exception) { null }
+    }
 
-    override suspend fun getQuizQuestions(quizId: String): Quiz? {
-        val filter = Filters.eq("quizId", quizId)
-        return quizzes.find(filter).first();
+    override suspend fun getQuizById(quizId: String): Quiz? {
+        val quizObjectId = getQuizObjectId(quizId)?: return null
+        return quizzes.findOneById(quizObjectId)
     }
 
     override suspend fun getQuizzes(): List<Quiz> {
         return quizzes.find().toList();
     }
 
-    override suspend fun getQuizById(quizId: String): Quiz? {
-        val filter = Filters.eq("quizId", quizId)
-        return quizzes.find(filter).first();
-    }
-    override suspend fun changeState(quizId: String, newState: String): String {
-        val filter = Filters.eq("quizId", quizId)
-        val update = Updates.set(Quiz::state.name, newState)
-        return quizzes.updateOne(filter, update).toString();
+    override suspend fun getQuizQuestions(quizId: String): List<Question?> {
+        val quizObjectId = getQuizObjectId(quizId)?: return emptyList()
+        val quiz = quizzes.findOneById(quizObjectId)?: return emptyList()
+
+        return quiz.questionIds.map { questions.findOneById(it) }
     }
 
-    override suspend fun deleteQuiz(quizId: String): String {
-        val filter = Filters.eq("quizId", quizId)
-        return quizzes.findOneAndDelete(filter)?.quizId.toString();
+    override suspend fun changeQuizState(quizId: String, newState: String): Boolean {
+        val quizObjectId = getQuizObjectId(quizId)?: return false
+        val quiz = quizzes.findOneById(quizObjectId)?: return false
+
+        if (!(Constants.QUIZ_STATES.contains(newState))) { return false }
+
+        quiz.state = newState
+
+        return quizzes.updateOneById(quizObjectId, quiz).wasAcknowledged()
     }
 
-    override suspend fun createQuiz(quiz: Quiz): Boolean {
-       return quizzes.insertOne(quiz).wasAcknowledged();
+    override suspend fun insertQuiz(quiz: Quiz): Boolean {
+        return quizzes.insertOne(quiz).wasAcknowledged()
     }
+
+    override suspend fun deleteQuiz(quizId: String): Boolean {
+        val quizObjectId = getQuizObjectId(quizId)?: return false
+        return quizzes.deleteOneById(quizObjectId).wasAcknowledged()
+    }
+
+    override suspend fun addQuestionToQuiz(quizId: String, questionId: String): Boolean {
+        val quizObjectId = getQuizObjectId(quizId)?: return false
+        val quiz = quizzes.findOneById(quizObjectId)?: return false
+
+        var questionInQuiz = false;
+        for (qId in quiz.questionIds) {
+            if (qId.toString() == questionId) {
+                questionInQuiz = true
+                break
+            }
+        }
+
+        if (questionInQuiz) { return false }
+
+        return try {
+            quiz.questionIds.add(ObjectId(questionId))
+            quizzes.updateOneById(quizObjectId, quiz).wasAcknowledged()
+        } catch (e: Exception) { false }
+    }
+
+    override suspend fun removeQuestionFromQuiz(quizId: String, questionId: String): Boolean {
+        val quizObjectId = getQuizObjectId(quizId)?: return false
+        val quiz = quizzes.findOneById(quizObjectId)?: return false
+
+        var questionInQuiz = false;
+        for (qId in quiz.questionIds) {
+            if (qId.toString() == questionId) {
+                questionInQuiz = true
+                break
+            }
+        }
+
+        if (!questionInQuiz) { return false }
+
+        return try {
+            quiz.questionIds.remove(ObjectId(questionId))
+            quizzes.updateOneById(quizObjectId, quiz).wasAcknowledged()
+        } catch (e: Exception) { false }
+    }
+
+    override suspend fun changeQuizName(quizId: String, newName: String): Boolean {
+        val quizObjectId = getQuizObjectId(quizId)?: return false
+        val quiz = quizzes.findOneById(quizObjectId)?: return false
+
+        quiz.name = newName
+
+        return quizzes.updateOneById(quizObjectId, quiz).wasAcknowledged()
+    }
+
 }

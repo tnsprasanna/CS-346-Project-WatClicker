@@ -21,9 +21,7 @@ class MongoUserDataSource(
     }
 
     override suspend fun getUserById(userId: String): User? {
-        if (userId.isEmpty()) return null
         val userObjectId = getUserObjectId(userId)?: return null
-
        return users.findOneById(userObjectId)
     }
 

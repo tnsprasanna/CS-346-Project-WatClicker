@@ -7,5 +7,6 @@ class Constants {
         const val OPEN = "OPEN";
         const val CLOSED = "CLOSED";
         const val FINISHED = "FINISHED";
+        val QUIZ_STATES = arrayOf(HIDDEN, OPEN, CLOSED, FINISHED);
     }
 }

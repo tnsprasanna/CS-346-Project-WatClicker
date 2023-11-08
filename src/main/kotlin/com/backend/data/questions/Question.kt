@@ -5,10 +5,9 @@ import org.bson.types.ObjectId
 
 data class Question (
     @BsonId val id: ObjectId = ObjectId(),
-    val questionId: String = String.toString(),
-    val question: String,
-    val options: List<String> = emptyList(),
-    val responses: List<Int> = emptyList(),
-    val answer: Int,
-    val selections: List<String> = emptyList()
+    var question: String,
+    var options: MutableList<String>,
+    var responses: MutableList<Int>,
+    var answer: Int,
+    var selections: MutableList<ObjectId>
 )
