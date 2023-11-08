@@ -126,8 +126,14 @@ class MongoUserDataSource(
         return users.updateOneById(userObjectId, user).wasAcknowledged();
     }
 
-    override suspend fun changePassword(userId: String, newPassword: String): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun changePassword(userId: String, newPassword: String, newSalt: String): Boolean {
+        val userObjectId = getUserObjectId(userId)?: return false;
+        val user = users.findOneById(userObjectId)?: return false;
+
+        user.password = newPassword;
+        user.salt = newSalt;
+
+        return users.updateOneById(userObjectId, user).wasAcknowledged();
     }
 
     override suspend fun addClassSectionToStudent(studentId: String, classSectionId: String): Boolean {

@@ -36,7 +36,7 @@ interface UserDataSource {
 
     suspend fun changeUsername(userId: String, newUsername: String): Boolean
 
-    suspend fun changePassword(userId: String, newPassword: String): Boolean
+    suspend fun changePassword(userId: String, newPassword: String, newSalt: String): Boolean
 
     suspend fun addClassSectionToStudent(studentId: String, classSectionId: String): Boolean
 }

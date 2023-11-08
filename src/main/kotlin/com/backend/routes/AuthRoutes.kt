@@ -2,6 +2,8 @@ package com.backend.routes
 
 import User
 import com.backend.data.Constants
+import com.backend.data.requests.ChangePasswordRequest
+import com.backend.data.requests.ClassSectionIdRequest
 import com.backend.data.requests.SignInRequest
 import com.backend.data.requests.SignUpRequest
 import com.backend.data.responses.AuthResponse
@@ -77,6 +79,43 @@ fun Route.signUp(
         }
 
         call.respond(HttpStatusCode.OK, "User Created!");
+    }
+}
+
+fun Route.changePassword(
+    userDataSource: UserDataSource,
+    hashingService: HashingService
+) {
+    authenticate {
+        post("changePassword") {
+            val principal = call.principal<JWTPrincipal>()
+
+            val userId = principal?.getClaim("userId", String::class) ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                return@post
+            }
+
+            val request = kotlin.runCatching { call.receiveNullable<ChangePasswordRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@post
+            }
+
+            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@post
+            }
+
+            val newSaltedHash = hashingService.generateSaltedHash(request.newPassword)
+
+            val res = userDataSource.changePassword(userId, newSaltedHash.hash, newSaltedHash.salt)
+            if (!res) {
+                call.respond(HttpStatusCode.Conflict, "Could not change password!")
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, "Password changed.")
+            return@post
+        }
     }
 }
 
