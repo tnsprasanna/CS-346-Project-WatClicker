@@ -1,6 +1,6 @@
 package com.backend.data.questions
 
-import Selection
+import Question
 
 interface QuestionDataSource {
 
@@ -10,6 +10,12 @@ interface QuestionDataSource {
 
      suspend fun deleteQuestion(questionId: String): Boolean
 
+     suspend fun addStat(questionId: String, selectedOption: Int): Boolean?
+
+     suspend fun removeStat(questionId: String, selectedOption: Int): Boolean?
+     suspend fun changeStat(questionId: String, oldOption: Int, newOption: Int): Boolean?
+
      // methods to edit every editable quiz field
+     // ...
 
 }

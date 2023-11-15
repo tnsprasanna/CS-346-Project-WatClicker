@@ -288,3 +288,56 @@ fun Route.removeStudentFromClassSection(
         }
     }
 }
+
+fun Route.changeClassSectionName(
+    classSectionDataSource: ClassSectionDataSource,
+    userDataSource: UserDataSource
+) {
+    authenticate {
+        post("changeClassSectionName") {
+            val principal = call.principal<JWTPrincipal>()
+
+            val userId = principal?.getClaim("userId", String::class) ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                return@post
+            }
+
+            val request = kotlin.runCatching { call.receiveNullable<ChangeClassSectionNameRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@post
+            }
+
+            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@post
+            }
+
+            if (user.role != Constants.TEACHER_ROLE) {
+                call.respond(HttpStatusCode.Conflict, "User must be a Teacher!")
+                return@post
+            }
+
+            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
+                return@post
+            }
+
+            if (user.id != classSection.teacherId) {
+                call.respond(HttpStatusCode.Conflict, "Caller must be the teacher of the classSection!")
+                return@post
+            }
+
+            val res = classSectionDataSource.changeClassSectionName(request.classSectionId, request.newName)?: kotlin.run{
+                call.respond(HttpStatusCode.Conflict, "Error in changing name - 1!")
+                return@post
+            }
+
+            if (!res) {
+                call.respond(HttpStatusCode.Conflict, "Error in changing name - 2!")
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, "Changed Class Section Name!")
+        }
+    }
+}

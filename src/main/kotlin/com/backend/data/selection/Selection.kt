@@ -1,10 +1,12 @@
-import kotlinx.serialization.Serializable
+package com.backend.data.selection
 
-@Serializable
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.types.ObjectId
+
 data class Selection(
-    val selectionId: String,
-    val questionId: String,
-    val studentId: String,
-    val selectedOption: Int,
-    val isCorrect: Boolean?
+    @BsonId val id: ObjectId = ObjectId(),
+    val questionId: ObjectId,
+    var studentId: ObjectId,
+    var selectedOption: Int,
+    var isCorrect: Boolean,
 )

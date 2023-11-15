@@ -22,7 +22,7 @@ class MongoUserDataSource(
 
     override suspend fun getUserById(userId: String): User? {
         val userObjectId = getUserObjectId(userId)?: return null
-       return users.findOneById(userObjectId)
+        return users.findOneById(userObjectId)
     }
 
     override suspend fun getUserByUsername(username: String): User? {
