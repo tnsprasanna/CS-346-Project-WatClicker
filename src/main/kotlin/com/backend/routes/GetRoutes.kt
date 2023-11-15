@@ -3,7 +3,7 @@ package com.backend.routes
 import User
 import com.backend.data.user.UserDataSource
 import com.backend.data.Constants
-import com.backend.data.lecture.LectureDataSource
+import com.backend.data.classSection.ClassSectionDataSource
 import com.backend.data.requests.*
 import com.backend.data.responses.*
 import io.ktor.http.*
@@ -398,7 +398,7 @@ fun Route.changeUsername(
 
 fun Route.getClassSections(
     userDataSource: UserDataSource,
-    lectureDataSource: LectureDataSource
+    classSectionDataSource: ClassSectionDataSource
 ) {
     authenticate {
         get("getClassSections") {
@@ -414,10 +414,12 @@ fun Route.getClassSections(
                 return@get
             }
 
-            val classSectionObjsList = lectureDataSource.getLectures(user.classSectionList)
+            val classSectionObjsList = user.classSectionList.map { classSectionDataSource.getClassSectionById(it.toString()) }
 
-            val classSectionRespList = classSectionObjsList.map {
-                c -> ClassSectionResponse(
+            val classSectionRespList = mutableListOf<ClassSectionResponse>()
+            for (c in classSectionObjsList) {
+                c?: continue
+                val temp = ClassSectionResponse(
                     c.id.toString(),
                     c.name,
                     c.teacherId.toString(),
@@ -427,6 +429,7 @@ fun Route.getClassSections(
                     c.joinCode,
                     c.isJoinable
                 )
+                classSectionRespList.add(temp)
             }
 
             call.respond(
@@ -438,7 +441,7 @@ fun Route.getClassSections(
 }
 
 fun Route.getClassSectionJoinableStatus(
-    lectureDataSource: LectureDataSource
+    classSectionDataSource: ClassSectionDataSource
 ) {
     get("getClassSectionJoinableStatus") {
         val request = kotlin.runCatching { call.receiveNullable<ClassSectionIdRequest>() }.getOrNull() ?: kotlin.run {
@@ -446,7 +449,7 @@ fun Route.getClassSectionJoinableStatus(
             return@get
         }
 
-        val classSection = lectureDataSource.getLectureByID(request.classSectionId)?: kotlin.run {
+        val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest, "ClassSection not found!")
             return@get
         }
@@ -459,7 +462,7 @@ fun Route.getClassSectionJoinableStatus(
 }
 
 fun Route.getClassSectionJoinCode(
-    lectureDataSource: LectureDataSource,
+    classSectionDataSource: ClassSectionDataSource,
     userDataSource: UserDataSource
 ) {
     authenticate{
@@ -481,7 +484,7 @@ fun Route.getClassSectionJoinCode(
                 return@get
             }
 
-            val classSection = lectureDataSource.getLectureByID(request.classSectionId)?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@get
             }
@@ -500,7 +503,7 @@ fun Route.getClassSectionJoinCode(
 }
 
 fun Route.makeClassSectionJoinable(
-    lectureDataSource: LectureDataSource,
+    classSectionDataSource: ClassSectionDataSource,
     userDataSource: UserDataSource
 ){
     authenticate{
@@ -522,7 +525,7 @@ fun Route.makeClassSectionJoinable(
                 return@post
             }
 
-            val classSection = lectureDataSource.getLectureByID(request.classSectionId)?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }
@@ -532,7 +535,10 @@ fun Route.makeClassSectionJoinable(
                 return@post
             }
 
-            val res = lectureDataSource.makeClassSectionJoinable(request.classSectionId)
+            val res = classSectionDataSource.makeClassSectionJoinable(request.classSectionId)?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, message = "Unable to make ClassSection joinable!")
+                return@post
+            }
             if (!res) {
                 call.respond(HttpStatusCode.Conflict, message = "Unable to make ClassSection joinable!")
                 return@post
@@ -545,7 +551,7 @@ fun Route.makeClassSectionJoinable(
 }
 
 fun Route.makeClassSectionUnjoinable(
-    lectureDataSource: LectureDataSource,
+    classSectionDataSource: ClassSectionDataSource,
     userDataSource: UserDataSource
 ) {
     authenticate{
@@ -567,7 +573,7 @@ fun Route.makeClassSectionUnjoinable(
                 return@post
             }
 
-            val classSection = lectureDataSource.getLectureByID(request.classSectionId)?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }
@@ -577,7 +583,10 @@ fun Route.makeClassSectionUnjoinable(
                 return@post
             }
 
-            val res = lectureDataSource.makeClassSectionUnjoinable(request.classSectionId)
+            val res = classSectionDataSource.makeClassSectionUnjoinable(request.classSectionId)?: kotlin.run{
+                call.respond(HttpStatusCode.Conflict, message = "Unable to make ClassSection unjoinable!")
+                return@post
+            }
             if (!res) {
                 call.respond(HttpStatusCode.Conflict, message = "Unable to make ClassSection unjoinable!")
                 return@post
@@ -589,9 +598,105 @@ fun Route.makeClassSectionUnjoinable(
     }
 }
 
+fun Route.makeClassSectionActive(
+    classSectionDataSource: ClassSectionDataSource,
+    userDataSource: UserDataSource
+){
+    authenticate{
+        post("makeClassSectionActive") {
+            val principal = call.principal<JWTPrincipal>()
+
+            val userId = principal?.getClaim("userId", String::class) ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                return@post
+            }
+
+            val request = kotlin.runCatching { call.receiveNullable<ClassSectionIdRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@post
+            }
+
+            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@post
+            }
+
+            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
+                return@post
+            }
+
+            if (classSection.teacherId.toString() != userId) {
+                call.respond(HttpStatusCode.Conflict, "Caller is not the teacher for this class!")
+                return@post
+            }
+
+            val res = classSectionDataSource.makeClassSectionActive(request.classSectionId)?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, message = "Unable to make ClassSection Active!")
+                return@post
+            }
+            if (!res) {
+                call.respond(HttpStatusCode.Conflict, message = "Unable to make ClassSection Active!")
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, message = "ClassSection is now Active!" )
+            return@post
+        }
+    }
+}
+
+fun Route.makeClassSectionInactive(
+    classSectionDataSource: ClassSectionDataSource,
+    userDataSource: UserDataSource
+) {
+    authenticate{
+        post("makeClassSectionInactive") {
+            val principal = call.principal<JWTPrincipal>()
+
+            val userId = principal?.getClaim("userId", String::class) ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                return@post
+            }
+
+            val request = kotlin.runCatching { call.receiveNullable<ClassSectionIdRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@post
+            }
+
+            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@post
+            }
+
+            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
+                return@post
+            }
+
+            if (classSection.teacherId.toString() != userId) {
+                call.respond(HttpStatusCode.Conflict, "Caller is not the teacher for this class!")
+                return@post
+            }
+
+            val res = classSectionDataSource.makeClassSectionInactive(request.classSectionId)?: kotlin.run{
+                call.respond(HttpStatusCode.Conflict, message = "Unable to make ClassSection Inactive!")
+                return@post
+            }
+            if (!res) {
+                call.respond(HttpStatusCode.Conflict, message = "Unable to make ClassSection Inactive!")
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, message = "ClassSection is now inactive!" )
+            return@post
+        }
+    }
+}
+
 fun Route.joinClassSection(
     userDataSource: UserDataSource,
-    lectureDataSource: LectureDataSource
+    classSectionDataSource: ClassSectionDataSource
 ) {
     authenticate{
         post("joinClassSection") {
@@ -612,7 +717,7 @@ fun Route.joinClassSection(
                 return@post
             }
 
-            val classSection = lectureDataSource.getLectureByID(request.classSectionId)?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }
@@ -645,13 +750,16 @@ fun Route.joinClassSection(
                 return@post
             }
 
-            val classSectionAdd = lectureDataSource.addStudentToClassSection(request.classSectionId, userId)
+            val classSectionAdd = classSectionDataSource.addStudentToClassSection(request.classSectionId, userId)?: kotlin.run{
+                call.respond(HttpStatusCode.Conflict, "Couldn't add student to class!")
+                return@post
+            }
             if (!classSectionAdd) {
                 call.respond(HttpStatusCode.Conflict, "Couldn't add student to class!")
                 return@post
             }
 
-            val studentAdd = userDataSource.addClassSectionToStudent(userId, request.classSectionId)
+            val studentAdd = userDataSource.addClassSectionToUser(userId, request.classSectionId)
             if (!studentAdd) {
                 call.respond(HttpStatusCode.Conflict, "Couldn't add class to student!")
                 return@post

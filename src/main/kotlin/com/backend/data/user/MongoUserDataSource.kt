@@ -136,11 +136,20 @@ class MongoUserDataSource(
         return users.updateOneById(userObjectId, user).wasAcknowledged();
     }
 
-    override suspend fun addClassSectionToStudent(studentId: String, classSectionId: String): Boolean {
-        val userObjectId = getUserObjectId(studentId)?: return false
+    override suspend fun addClassSectionToUser(userId: String, classSectionId: String): Boolean {
+        val userObjectId = getUserObjectId(userId)?: return false
         val user = users.findOneById(userObjectId)?: return false
 
         user.classSectionList.add(userObjectId)
+
+        return users.updateOneById(userObjectId, user).wasAcknowledged()
+    }
+
+    override suspend fun removeClassSectionFromUser(userId: String, classSectionId: String): Boolean {
+        val userObjectId = getUserObjectId(userId)?: return false
+        val user = users.findOneById(userObjectId)?: return false
+
+        user.classSectionList.remove(userObjectId)
 
         return users.updateOneById(userObjectId, user).wasAcknowledged()
     }

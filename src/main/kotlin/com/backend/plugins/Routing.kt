@@ -1,6 +1,7 @@
 package com.backend.plugins
 
 import com.backend.*
+import com.backend.data.classSection.ClassSectionDataSource
 import com.backend.data.quiz.QuizDataSource
 import com.backend.routes.authenticate
 import com.backend.data.user.UserDataSource
@@ -12,14 +13,11 @@ import com.backend.security.token.TokenConfig
 import com.backend.security.token.TokenService
 import com.backend.routes.signIn
 import com.backend.routes.signUp
-import com.backend.routes.addQuestion
-import com.backend.routes.getQuestion
 import com.backend.routes.deleteQuestion
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.backend.data.lecture.LectureDataSource
 import com.backend.data.selection.SelectionDataSource
 
 
@@ -30,7 +28,7 @@ fun Application.configureRouting(
     hashingService: HashingService,
     tokenService: TokenService,
     tokenConfig: TokenConfig,
-    lectureDataSource: LectureDataSource,
+    classSectionDataSource: ClassSectionDataSource,
     selectionDataSource: SelectionDataSource
 ) {
     routing {
@@ -43,14 +41,14 @@ fun Application.configureRouting(
         getTeachers(userDataSource)
 
         getQuestionById(questionDataSource)
-        createQuestion(userDataSource, lectureDataSource, quizDataSource, questionDataSource)
-        deleteQuestion(userDataSource, lectureDataSource, quizDataSource, questionDataSource)
+        createQuestion(userDataSource, classSectionDataSource, quizDataSource, questionDataSource)
+        deleteQuestion(userDataSource, classSectionDataSource, quizDataSource, questionDataSource)
         // APIs for Editing Quiz Fields
 
-        createQuiz(userDataSource, lectureDataSource, quizDataSource)
+        createQuiz(userDataSource, classSectionDataSource, quizDataSource)
         getQuizById(quizDataSource)
-        changeQuizState(userDataSource, lectureDataSource, quizDataSource)
-        deleteQuiz(userDataSource, lectureDataSource, quizDataSource)
+        changeQuizState(userDataSource, classSectionDataSource, quizDataSource)
+        deleteQuiz(userDataSource, classSectionDataSource, quizDataSource)
         getQuizQuestions(quizDataSource, questionDataSource)
 
         getUserById(userDataSource)
@@ -64,16 +62,23 @@ fun Application.configureRouting(
         changeLastName(userDataSource)
         changeFirstAndLastName(userDataSource)
         changeUsername(userDataSource)
-        createLecture(lectureDataSource)
-        deleteLecture(lectureDataSource)
-        getClassSections(userDataSource, lectureDataSource)
-        getLectureQuizzes(lectureDataSource)
 
-        getClassSectionJoinableStatus(lectureDataSource)
-        getClassSectionJoinCode(lectureDataSource, userDataSource)
-        makeClassSectionJoinable(lectureDataSource, userDataSource)
-        makeClassSectionUnjoinable(lectureDataSource, userDataSource)
-        joinClassSection(userDataSource, lectureDataSource)
+        getClassSectionById(classSectionDataSource)
+        createClassSection(classSectionDataSource, userDataSource)
+        deleteClassSection(classSectionDataSource, userDataSource)
+        getQuizzesInClassSection(classSectionDataSource)
+        getStudentsInClassSection(classSectionDataSource)
+        removeStudentFromClassSection(classSectionDataSource, userDataSource)
+
+        getClassSections(userDataSource, classSectionDataSource) //
+        getClassSectionJoinableStatus(classSectionDataSource)
+        getClassSectionJoinCode(classSectionDataSource, userDataSource)
+        makeClassSectionJoinable(classSectionDataSource, userDataSource)
+        makeClassSectionUnjoinable(classSectionDataSource, userDataSource)
+        makeClassSectionActive(classSectionDataSource, userDataSource)
+        makeClassSectionInactive(classSectionDataSource, userDataSource)
+        joinClassSection(userDataSource, classSectionDataSource)
+
 
         createSelection(selectionDataSource, questionDataSource, userDataSource)
         deleteSelection(selectionDataSource)

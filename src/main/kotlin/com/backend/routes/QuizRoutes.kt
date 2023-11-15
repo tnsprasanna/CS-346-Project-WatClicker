@@ -2,7 +2,7 @@ package com.backend.routes
 
 import Quiz
 import com.backend.data.Constants
-import com.backend.data.lecture.LectureDataSource
+import com.backend.data.classSection.ClassSectionDataSource
 import com.backend.data.questions.QuestionDataSource
 import com.backend.data.quiz.QuizDataSource
 import com.backend.data.requests.*
@@ -22,7 +22,7 @@ import io.ktor.server.auth.jwt.*
 
 fun Route.createQuiz(
     userDataSource: UserDataSource,
-    lectureDataSource: LectureDataSource,
+    classSectionDataSource: ClassSectionDataSource,
     quizDataSource: QuizDataSource,
 ) {
     authenticate {
@@ -44,7 +44,7 @@ fun Route.createQuiz(
                 return@post
             }
 
-            val classSection = lectureDataSource.getLectureByID(request.classSectionId)?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }
@@ -113,7 +113,7 @@ fun Route.getQuizById(
 
 fun Route.changeQuizState(
     userDataSource: UserDataSource,
-    lectureDataSource: LectureDataSource,
+    classSectionDataSource: ClassSectionDataSource,
     quizDataSource: QuizDataSource
 ) {
     authenticate {
@@ -145,7 +145,7 @@ fun Route.changeQuizState(
                 return@post
             }
 
-            val classSection = lectureDataSource.getLectureByID(quiz.classSectionId.toString())?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionById(quiz.classSectionId.toString())?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }
@@ -173,7 +173,7 @@ fun Route.changeQuizState(
 
 fun Route.deleteQuiz(
     userDataSource: UserDataSource,
-    lectureDataSource: LectureDataSource,
+    classSectionDataSource: ClassSectionDataSource,
     quizDataSource: QuizDataSource
 ) {
     authenticate {
@@ -205,7 +205,7 @@ fun Route.deleteQuiz(
                 return@post
             }
 
-            val classSection = lectureDataSource.getLectureByID(quiz.classSectionId.toString())?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionById(quiz.classSectionId.toString())?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }

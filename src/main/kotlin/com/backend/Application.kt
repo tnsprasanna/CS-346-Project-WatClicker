@@ -1,6 +1,7 @@
 package com.backend
 
 import User
+import com.backend.data.classSection.MongoClassSectionDataSource
 import com.backend.data.questions.MongoQuestionDataSource
 import com.backend.data.quiz.MongoQuizDataSource
 import com.backend.data.user.MongoUserDataSource
@@ -13,7 +14,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
-import com.backend.data.lecture.MongoLectureDataSource
 import com.backend.data.selection.MongoSelectionDataSource
 
 fun main(args: Array<String>) {
@@ -33,7 +33,7 @@ fun Application.module() {
     val userDataSource = MongoUserDataSource(db);
     val quizDataSource = MongoQuizDataSource(db);
     val questionDataSource = MongoQuestionDataSource(db);
-    val lectureDataSource = MongoLectureDataSource(db);
+    val classSectionDataSource = MongoClassSectionDataSource(db);
     val selectionDataSource = MongoSelectionDataSource(db);
     val tokenService = JwtTokenService()
     val tokenConfig = TokenConfig(
@@ -49,34 +49,5 @@ fun Application.module() {
     configureMonitoring()
     configureSecurity(tokenConfig)
     configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService,
-        tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
 }
-
-/*
-- signup - DONE
-- login - DONE
-- are they a teacher/student - DONE
-- getQuestions for a quiz - DONE
-
-
-- teacher can createQuiz - VERIFY IT'S A TEACHER - VIPASHA
-
-- teacher can create new class  - SINEHA
-- get classes for student and teacher - DONE BUT NEEDS TESTING
-
-- getJoinableStatus
-- teacher can make class joinable or unjoinable
-- teacher can get join code
-
-- allow students to join class using a join code
-
-
-
-
-
-- get quizlist for a class
-
-- student submit their quiz answers
-- change quiz states DONE
-- get quiz state
-*/

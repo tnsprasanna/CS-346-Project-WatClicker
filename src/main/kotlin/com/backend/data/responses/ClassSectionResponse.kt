@@ -1,7 +1,6 @@
 package com.backend.data.responses
 
 import User
-import Lecture
 
 import org.bson.codecs.pojo.annotations.BsonId
 import kotlinx.serialization.Contextual

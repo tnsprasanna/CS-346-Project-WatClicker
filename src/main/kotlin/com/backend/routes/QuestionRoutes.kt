@@ -1,7 +1,8 @@
 package com.backend.routes
 
 import com.backend.data.Constants
-import com.backend.data.lecture.LectureDataSource
+import com.backend.data.classSection.ClassSectionDataSource
+import com.backend.data.classSection.MongoClassSectionDataSource
 import com.backend.data.questions.Question
 import com.backend.data.questions.QuestionDataSource
 import com.backend.data.quiz.QuizDataSource
@@ -52,7 +53,7 @@ fun Route.getQuestionById(
 
 fun Route.createQuestion(
     userDataSource: UserDataSource,
-    lectureDataSource: LectureDataSource,
+    classSectionDataSource: ClassSectionDataSource,
     quizDataSource: QuizDataSource,
     questionDataSource: QuestionDataSource
 ) {
@@ -85,7 +86,7 @@ fun Route.createQuestion(
                 return@post
             }
 
-            val classSection = lectureDataSource.getLectureByID(quiz.classSectionId.toString())?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionById(quiz.classSectionId.toString())?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }
@@ -128,7 +129,7 @@ fun Route.createQuestion(
 
 fun Route.deleteQuestion(
     userDataSource: UserDataSource,
-    lectureDataSource: LectureDataSource,
+    classSectionDataSource: ClassSectionDataSource,
     quizDataSource: QuizDataSource,
     questionDataSource: QuestionDataSource
 ) {
@@ -161,7 +162,7 @@ fun Route.deleteQuestion(
                 return@post
             }
 
-            val classSection = lectureDataSource.getLectureByID(quiz.classSectionId.toString())?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionById(quiz.classSectionId.toString())?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }
