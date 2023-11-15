@@ -1,6 +1,5 @@
 package com.backend.data.requests
 
-import Selection
 import kotlinx.serialization.Serializable
 
 @Serializable

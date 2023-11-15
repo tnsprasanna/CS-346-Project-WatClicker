@@ -66,7 +66,7 @@ fun Route.createClassSection(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -118,7 +118,7 @@ fun Route.deleteClassSection(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -249,7 +249,7 @@ fun Route.removeStudentFromClassSection(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -307,7 +307,7 @@ fun Route.changeClassSectionName(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }

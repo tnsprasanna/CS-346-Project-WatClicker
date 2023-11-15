@@ -1,7 +1,7 @@
 package com.backend.data.quiz
 
 import Quiz
-import com.backend.data.questions.Question
+import Question
 
 interface QuizDataSource {
 

@@ -1,9 +1,9 @@
 package com.backend.routes
 
+import Question
 import com.backend.data.Constants
 import com.backend.data.classSection.ClassSectionDataSource
 import com.backend.data.classSection.MongoClassSectionDataSource
-import com.backend.data.questions.Question
 import com.backend.data.questions.QuestionDataSource
 import com.backend.data.quiz.QuizDataSource
 import com.backend.data.requests.*

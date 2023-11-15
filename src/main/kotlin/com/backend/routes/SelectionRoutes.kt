@@ -222,9 +222,12 @@ fun Route.editSelection(
                 return@post
             }
 
-            val res1 = questionDataSource.changeStat(question.id.toString(), selection.selectedOption, request.newOption)
-            val res2 = selectionDataSource.editSelection(request.selectionId, request.newOption, question.answer == request.newOption) ?: kotlin.run {
+            val res1 = questionDataSource.changeStat(question.id.toString(), selection.selectedOption, request.newOption)?: kotlin.run{
                 call.respond(HttpStatusCode.Conflict, "Could not edit selection! DataBase Error 1")
+                return@post
+            }
+            val res2 = selectionDataSource.editSelection(request.selectionId, request.newOption, question.answer == request.newOption) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "Could not edit selection! DataBase Error 2")
                 return@post
             }
 
