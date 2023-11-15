@@ -70,7 +70,7 @@ fun Application.configureRouting(
         getStudentsInClassSection(classSectionDataSource)
         removeStudentFromClassSection(classSectionDataSource, userDataSource)
 
-        getClassSections(userDataSource, classSectionDataSource) //
+        getClassSections(userDataSource, classSectionDataSource)
         getClassSectionJoinableStatus(classSectionDataSource)
         getClassSectionJoinCode(classSectionDataSource, userDataSource)
         makeClassSectionJoinable(classSectionDataSource, userDataSource)
