@@ -26,7 +26,7 @@ fun Route.createSelection(selectionDataSource: SelectionDataSource, questionData
             return@post
         }
 
-        val question = questionDataSource.getQuestion(request.questionId);
+        val question = questionDataSource.getQuestionById(request.questionId);
         val optionsLen = question?.options?.size;
         if (question == null) {
             call.respond(HttpStatusCode.Conflict, "Invalid question selected.")
@@ -114,7 +114,7 @@ fun Route.editSelection(selectionDataSource: SelectionDataSource, questionDataSo
             call.respond(HttpStatusCode.BadRequest)
             return@patch
         }
-        val question = questionDataSource.getQuestion(request.questionId);
+        val question = questionDataSource.getQuestionById(request.questionId);
         val len = question?.options?.size;
 
         if (question == null) {
