@@ -177,52 +177,52 @@ fun Route.deleteQuiz(
     quizDataSource: QuizDataSource
 ) {
     authenticate {
-        post("changeQuizState") {
+    delete("deleteQuiz") {
             val principal = call.principal<JWTPrincipal>()
 
             val userId = principal?.getClaim("userId", String::class)?: kotlin.run{
                 call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
-                return@post
+                return@delete
             }
 
             val request = kotlin.runCatching { call.receiveNullable<QuizIdRequest>() }.getOrNull() ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
-                return@post
+                return@delete
             }
 
             val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
-                return@post
+                return@delete
             }
 
             if (user.role != Constants.TEACHER_ROLE) {
                 call.respond(HttpStatusCode.Conflict, "User must be a Teacher!")
-                return@post
+                return@delete
             }
 
             val quiz = quizDataSource.getQuizById(request.quizId)?: kotlin.run{
                 call.respond(HttpStatusCode.Conflict, "Quiz not found!")
-                return@post
+                return@delete
             }
 
             val classSection = classSectionDataSource.getClassSectionById(quiz.classSectionId.toString())?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
-                return@post
+                return@delete
             }
 
             if (classSection.teacherId.toString() != userId) {
                 call.respond(HttpStatusCode.Conflict, "User is not the teacher of the class that this quiz is a part of!")
-                return@post
+                return@delete
             }
 
             val res = quizDataSource.deleteQuiz(request.quizId)
 
             if (!res) {
                 call.respond(HttpStatusCode.Conflict, "Unable to delete quiz!");
-                return@post
+                return@delete
             }
 
-            call.respond(HttpStatusCode.OK, "Quiz State Changed!");
+            call.respond(HttpStatusCode.OK, "Quiz Deleted!");
         }
     }
 }
