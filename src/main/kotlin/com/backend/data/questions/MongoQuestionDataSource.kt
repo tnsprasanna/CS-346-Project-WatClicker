@@ -31,6 +31,11 @@ class MongoQuestionDataSource(
         return questions.deleteOneById(questionObjectId).wasAcknowledged()
     }
 
+    override suspend fun getResponsesFromQuestion(questionId: String): Question? {
+        val questionObjectId = getQuestionObjectId(questionId)?: return null
+        return questions.findOneById(questionObjectId)
+    }
+
     override suspend fun addStat(questionId: String, selectedOption: Int): Boolean? {
         val questionObjectId = getQuestionObjectId(questionId)?: return null
         val question = questions.findOneById(questionObjectId)?: return null

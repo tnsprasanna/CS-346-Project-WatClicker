@@ -10,6 +10,7 @@ interface QuestionDataSource {
 
      suspend fun deleteQuestion(questionId: String): Boolean
 
+     suspend fun getResponsesFromQuestion(questionId: String): Question?
      suspend fun addStat(questionId: String, selectedOption: Int): Boolean?
 
      suspend fun removeStat(questionId: String, selectedOption: Int): Boolean?

@@ -366,6 +366,32 @@ class ApplicationTest {
         }
     }
 
+    @Test // Invalid
+    fun testAddQuestion2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, lectureDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "question" : "fave colour",
+            "options": ["red", "blue"],
+            "responses": [1, 1, 0],
+            "answer": 0
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/addQuestion")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
     @Test // Valid
     fun testDeleteQuestion2() = testApplication {
         application {
