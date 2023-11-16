@@ -10,6 +10,8 @@ interface QuestionDataSource {
 
      suspend fun deleteQuestion(questionId: String): Boolean
 
+     suspend fun getResponsesFromQuestion(questionId: String): Question?
+
      // methods to edit every editable quiz field
 
 }

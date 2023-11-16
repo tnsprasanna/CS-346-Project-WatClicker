@@ -8,6 +8,7 @@ import com.backend.data.questions.QuestionDataSource
 import com.backend.data.quiz.QuizDataSource
 import com.backend.data.requests.*
 import com.backend.data.responses.QuestionResponse
+import com.backend.data.responses.GetResponsesResponse
 import com.backend.data.selection.SelectionDataSource
 import com.backend.data.user.UserDataSource
 import com.backend.security.hashing.HashingService
@@ -196,7 +197,30 @@ fun Route.deleteQuestion(
 }
 
 
+fun Route.getResponsesFromQuestion(
+    questionDataSource: QuestionDataSource
+) {
+    get("getResponsesFromQuestion") {
+        val request = kotlin.runCatching { call.receiveNullable<GetResponsesFromQuestionRequest>() }.getOrNull()?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+            return@get
+        }
 
+        val question = questionDataSource.getQuestionById(request.questionId)?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest, "Question not found!")
+            return@get
+        }
+
+        val questionResponse = GetResponsesResponse(
+            response = question.responses
+        )
+
+        call.respond(
+            status = HttpStatusCode.OK,
+            message = questionResponse
+        )
+    }
+}
 
 //
 //fun Route.addQuestion(

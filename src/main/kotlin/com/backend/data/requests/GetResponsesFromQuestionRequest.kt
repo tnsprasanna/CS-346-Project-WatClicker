@@ -1,4 +1,8 @@
 package com.backend.data.requests
 
-class GetResponsesFromQuestionRequest {
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+class GetResponsesFromQuestionRequest (
+    val questionId: String
+)

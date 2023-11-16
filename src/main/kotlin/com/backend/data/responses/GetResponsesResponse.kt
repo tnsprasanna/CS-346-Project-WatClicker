@@ -1,4 +1,8 @@
 package com.backend.data.responses
 
-class GetResponsesResponse {
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+class GetResponsesResponse (
+    val response: MutableList<Int>
+)
