@@ -1,8 +1,8 @@
 package com.backend.data.quiz
 
 import Quiz
+import Question
 import com.backend.data.Constants
-import com.backend.data.questions.Question
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates

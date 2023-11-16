@@ -70,6 +70,7 @@ fun Application.configureRouting(
         getQuizzesInClassSection(classSectionDataSource)
         getStudentsInClassSection(classSectionDataSource)
         removeStudentFromClassSection(classSectionDataSource, userDataSource)
+        changeClassSectionName(classSectionDataSource, userDataSource)
 
         getClassSections(userDataSource, classSectionDataSource)
         getClassSectionJoinableStatus(classSectionDataSource)
@@ -80,11 +81,12 @@ fun Application.configureRouting(
         makeClassSectionInactive(classSectionDataSource, userDataSource)
         joinClassSection(userDataSource, classSectionDataSource)
 
-
-        createSelection(selectionDataSource, questionDataSource, userDataSource)
-        deleteSelection(selectionDataSource)
-        editSelection(selectionDataSource, questionDataSource)
         getSelectionById(selectionDataSource)
+        getSelectionByUserAndQuestionId(selectionDataSource, userDataSource, questionDataSource)
+        createSelection(selectionDataSource, userDataSource, questionDataSource)
+        deleteSelection(selectionDataSource, userDataSource, questionDataSource)
+        editSelection(selectionDataSource, userDataSource, questionDataSource)
+
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")

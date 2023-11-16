@@ -141,7 +141,7 @@ fun Route.isStudentFromUsername(
             return@get
         }
 
-        val user = userDataSource.getUserByUsername(request.username)?: kotlin.run {
+        val user = userDataSource.getUserById(request.username)?: kotlin.run {
             call.respond(HttpStatusCode.Conflict, "User not found!")
             return@get
         }
@@ -185,7 +185,7 @@ fun Route.isTeacherFromUsername(
             return@get
         }
 
-        val user = userDataSource.getUserByUsername(request.username)?: kotlin.run{
+        val user = userDataSource.getUserById(request.username)?: kotlin.run{
             call.respond(HttpStatusCode.Conflict, "User not found!")
             return@get
         }
@@ -210,7 +210,7 @@ fun Route.deleteUser(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId)?: kotlin.run {
+            val user = userDataSource.getUserById(userId)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -239,7 +239,7 @@ fun Route.changeRole(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId)?: kotlin.run {
+            val user = userDataSource.getUserById(userId)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -277,7 +277,7 @@ fun Route.changeFirstName(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -311,7 +311,7 @@ fun Route.changeLastName(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -345,7 +345,7 @@ fun Route.changeFirstAndLastName(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -379,7 +379,7 @@ fun Route.changeUsername(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -409,7 +409,7 @@ fun Route.getClassSections(
                 return@get
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@get
             }
@@ -479,7 +479,7 @@ fun Route.getClassSectionJoinCode(
                 return@get
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@get
             }
@@ -520,8 +520,8 @@ fun Route.makeClassSectionJoinable(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
-                call.respond(HttpStatusCode.Conflict, "User not found!")
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found2!")
                 return@post
             }
 
@@ -568,7 +568,7 @@ fun Route.makeClassSectionUnjoinable(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -616,7 +616,7 @@ fun Route.makeClassSectionActive(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -664,7 +664,7 @@ fun Route.makeClassSectionInactive(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -712,12 +712,12 @@ fun Route.joinClassSection(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
 
-            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionByJoinCode(request.classSectionJoinCode)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }
@@ -739,7 +739,7 @@ fun Route.joinClassSection(
 
             var studentInClass = false;
             for (classSectionId in user.classSectionList) {
-                if (classSectionId.toString() == request.classSectionId) {
+                if (classSectionId.toString() == classSection.id.toString()) {
                     studentInClass = true
                     break
                 }
@@ -750,7 +750,7 @@ fun Route.joinClassSection(
                 return@post
             }
 
-            val classSectionAdd = classSectionDataSource.addStudentToClassSection(request.classSectionId, userId)?: kotlin.run{
+            val classSectionAdd = classSectionDataSource.addStudentToClassSection(classSection.id.toString(), userId)?: kotlin.run{
                 call.respond(HttpStatusCode.Conflict, "Couldn't add student to class!")
                 return@post
             }
@@ -759,7 +759,7 @@ fun Route.joinClassSection(
                 return@post
             }
 
-            val studentAdd = userDataSource.addClassSectionToUser(userId, request.classSectionId)
+            val studentAdd = userDataSource.addClassSectionToUser(userId, classSection.id.toString())
             if (!studentAdd) {
                 call.respond(HttpStatusCode.Conflict, "Couldn't add class to student!")
                 return@post
