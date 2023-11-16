@@ -717,7 +717,7 @@ fun Route.joinClassSection(
                 return@post
             }
 
-            val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
+            val classSection = classSectionDataSource.getClassSectionByJoinCode(request.classSectionJoinCode)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
                 return@post
             }
@@ -739,7 +739,7 @@ fun Route.joinClassSection(
 
             var studentInClass = false;
             for (classSectionId in user.classSectionList) {
-                if (classSectionId.toString() == request.classSectionId) {
+                if (classSectionId.toString() == classSection.id.toString()) {
                     studentInClass = true
                     break
                 }
@@ -750,7 +750,7 @@ fun Route.joinClassSection(
                 return@post
             }
 
-            val classSectionAdd = classSectionDataSource.addStudentToClassSection(request.classSectionId, userId)?: kotlin.run{
+            val classSectionAdd = classSectionDataSource.addStudentToClassSection(classSection.id.toString(), userId)?: kotlin.run{
                 call.respond(HttpStatusCode.Conflict, "Couldn't add student to class!")
                 return@post
             }
@@ -759,7 +759,7 @@ fun Route.joinClassSection(
                 return@post
             }
 
-            val studentAdd = userDataSource.addClassSectionToUser(userId, request.classSectionId)
+            val studentAdd = userDataSource.addClassSectionToUser(userId, classSection.id.toString())
             if (!studentAdd) {
                 call.respond(HttpStatusCode.Conflict, "Couldn't add class to student!")
                 return@post

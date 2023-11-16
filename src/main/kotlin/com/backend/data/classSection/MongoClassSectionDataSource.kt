@@ -19,12 +19,23 @@ class MongoClassSectionDataSource(
         return try { ObjectId(classSectionId) } catch (e: Exception) { null }
     }
 
+    override suspend fun getClassSectionByJoinCode(classSectionJoinCode: String): ClassSection? {
+        return classSections.findOne(ClassSection::joinCode eq classSectionJoinCode)
+    }
+
     override suspend fun getClassSectionById(classSectionId: String): ClassSection? {
         val classSectionObjectId = getClassSectionObjectId(classSectionId)?: return null
         return classSections.findOneById(classSectionObjectId)
     }
 
     override suspend fun createClassSection(classSection: ClassSection): Boolean {
+        var existingClass = classSections.findOne(ClassSection::joinCode eq classSection.joinCode)
+
+        while (existingClass != null) {
+            classSection.joinCode = (1..8).map { ('a'..'z').random() }.joinToString("")
+            existingClass = classSections.findOne(ClassSection::joinCode eq classSection.joinCode)
+        }
+
         return classSections.insertOne(classSection).wasAcknowledged()
     }
 

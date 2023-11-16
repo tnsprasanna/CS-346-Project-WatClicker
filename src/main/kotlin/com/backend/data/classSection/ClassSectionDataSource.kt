@@ -7,6 +7,8 @@ import org.bson.types.ObjectId
 interface ClassSectionDataSource {
     suspend fun getClassSectionById(classSectionId: String): ClassSection?
 
+    suspend fun getClassSectionByJoinCode(classSectionJoinCode: String): ClassSection?
+
     suspend fun createClassSection(classSection: ClassSection): Boolean
 
     suspend fun deleteClassSection(classSectionId: String): Boolean
