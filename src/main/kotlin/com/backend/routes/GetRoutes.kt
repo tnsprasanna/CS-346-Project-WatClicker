@@ -316,7 +316,7 @@ fun Route.changeLastName(
                 return@post
             }
 
-            val res = userDataSource.changeLastName(userId, request.newFirstName)
+            val res = userDataSource.changeLastName(userId, request.newLastName)
             if (!res) {
                 call.respond(HttpStatusCode.Conflict, "Could not change user's lastname!")
                 return@post
