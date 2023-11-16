@@ -35,7 +35,7 @@ class MongoQuestionDataSource(
         val questionObjectId = getQuestionObjectId(questionId)?: return null
         val question = questions.findOneById(questionObjectId)?: return null
 
-        if (selectedOption >= question.responses.size || 0 > selectedOption) {
+        if (selectedOption >= question.options.size || selectedOption < 0) {
             return null
         }
 

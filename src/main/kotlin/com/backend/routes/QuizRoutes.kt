@@ -39,7 +39,7 @@ fun Route.createQuiz(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -76,7 +76,7 @@ fun Route.createQuiz(
                 call.respond(HttpStatusCode.Conflict, "Unable to create quiz! Database Error.");
                 return@post
             }
-
+            classSectionDataSource.addQuizToClassSection(classSection.id.toString(), quiz.id.toString())
             call.respond(HttpStatusCode.OK, "Quiz Created!");
         }
     }
@@ -130,7 +130,7 @@ fun Route.changeQuizState(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -190,7 +190,7 @@ fun Route.deleteQuiz(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }

@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class QuestionListResponse(
-    val users: List<QuestionResponse>
+    val questions: List<QuestionResponse>
 )

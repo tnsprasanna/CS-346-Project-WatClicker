@@ -105,43 +105,43 @@ fun Route.deleteClassSection(
     userDataSource: UserDataSource
 ) {
     authenticate{
-        post("deleteClassSection") {
+        delete("deleteClassSection") {
             val principal = call.principal<JWTPrincipal>()
 
             val userId = principal?.getClaim("userId", String::class) ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
-                return@post
+                return@delete
             }
 
             val request = kotlin.runCatching { call.receiveNullable<ClassSectionIdRequest>() }.getOrNull() ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
-                return@post
+                return@delete
             }
 
             val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
-                return@post
+                return@delete
             }
 
             if (user.role != Constants.TEACHER_ROLE) {
                 call.respond(HttpStatusCode.Conflict, "User must be a Teacher!")
-                return@post
+                return@delete
             }
 
             val classSection = classSectionDataSource.getClassSectionById(request.classSectionId)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
-                return@post
+                return@delete
             }
 
             if (user.id != classSection.teacherId) {
                 call.respond(HttpStatusCode.Conflict, "Caller must be the teacher of the classSection!")
-                return@post
+                return@delete
             }
 
             val res = classSectionDataSource.deleteClassSection(request.classSectionId)
             if (!res) {
                 call.respond(HttpStatusCode.Conflict, "Unable to delete classSection! Database Error.");
-                return@post
+                return@delete
             }
 
             userDataSource.removeClassSectionFromUser(userId, request.classSectionId)
@@ -169,7 +169,7 @@ fun Route.getQuizzesInClassSection(
             call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
             return@get
         }
-
+        print(quizzes)
         val quizRespList = mutableListOf<QuizResponse>()
         for (q in quizzes) {
             q?: continue

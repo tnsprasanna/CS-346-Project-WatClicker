@@ -71,7 +71,7 @@ fun Route.createQuestion(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -104,11 +104,10 @@ fun Route.createQuestion(
             val question = Question(
                 question = request.question,
                 options =request.options.toMutableList(),
-                responses = mutableListOf<Int>(),
+                responses =  MutableList(request.options.size) {0},
                 answer = request.answer,
                 selections = mutableListOf<ObjectId>()
             )
-
             val res1 = questionDataSource.insertQuestion(question)
             if (!res1) {
                 call.respond(HttpStatusCode.Conflict, "Unable to insert Question - Could not create!")
@@ -147,7 +146,7 @@ fun Route.deleteQuestion(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }

@@ -81,6 +81,7 @@ fun Application.configureRouting(
         joinClassSection(userDataSource, classSectionDataSource)
 
         getSelectionById(selectionDataSource)
+        getSelectionByUserAndQuestionId(selectionDataSource, userDataSource, questionDataSource)
         createSelection(selectionDataSource, userDataSource, questionDataSource)
         deleteSelection(selectionDataSource, userDataSource, questionDataSource)
         editSelection(selectionDataSource, userDataSource, questionDataSource)

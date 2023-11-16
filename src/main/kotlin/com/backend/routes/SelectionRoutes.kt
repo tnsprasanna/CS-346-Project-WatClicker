@@ -1,5 +1,6 @@
 package com.backend.routes
 
+import Question
 import Quiz
 import com.backend.data.Constants
 import com.backend.data.questions.QuestionDataSource
@@ -51,6 +52,60 @@ fun Route.getSelectionById(
 }
 
 
+fun Route.getSelectionByUserAndQuestionId(
+    selectionDataSource: SelectionDataSource,
+    userDataSource: UserDataSource,
+    questionDataSource: QuestionDataSource
+) {
+    authenticate {
+        get("getSelectionByUserAndQuestionId") {
+            val principal = call.principal<JWTPrincipal>()
+
+            val userId = principal?.getClaim("userId", String::class) ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                return@get
+            }
+
+            val request = kotlin.runCatching { call.receiveNullable<GetSelectionByUserAndQuestionIdRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@get
+            }
+
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@get
+            }
+
+            if (user.role != Constants.STUDENT_ROLE) {
+                call.respond(HttpStatusCode.Conflict, "User must be a student!")
+                return@get
+            }
+
+            val question = questionDataSource.getQuestionById(request.questionId)?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "Question not found!")
+                return@get
+            }
+
+            val selection = selectionDataSource.getSelectionByUserAndQuestionId(userId, request.questionId)?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "Selection not found!")
+                return@get
+            }
+
+            call.respond(
+                status = HttpStatusCode.OK,
+                message = SelectionResponse(
+                    id = selection.id.toString(),
+                    questionId = selection.questionId.toString(),
+                    studentId = selection.studentId.toString(),
+                    selectedOption = selection.selectedOption,
+                    isCorrect = selection.isCorrect
+                )
+            )
+        }
+    }
+}
+
+
 fun Route.createSelection(
     selectionDataSource: SelectionDataSource,
     userDataSource: UserDataSource,
@@ -70,7 +125,7 @@ fun Route.createSelection(
                 return@post
             }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -137,7 +192,7 @@ fun Route.deleteSelection(
                     return@post
                 }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }
@@ -197,7 +252,7 @@ fun Route.editSelection(
                     return@post
                 }
 
-            val user = userDataSource.getUserByUsername(userId) ?: kotlin.run {
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "User not found!")
                 return@post
             }

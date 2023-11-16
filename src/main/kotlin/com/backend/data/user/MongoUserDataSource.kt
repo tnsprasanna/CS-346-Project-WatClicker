@@ -140,7 +140,7 @@ class MongoUserDataSource(
         val userObjectId = getUserObjectId(userId)?: return false
         val user = users.findOneById(userObjectId)?: return false
 
-        user.classSectionList.add(userObjectId)
+        user.classSectionList.add(ObjectId(classSectionId))
 
         return users.updateOneById(userObjectId, user).wasAcknowledged()
     }

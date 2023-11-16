@@ -117,7 +117,7 @@ class MongoClassSectionDataSource(
     override suspend fun addQuizToClassSection(classSectionId: String, quizId: String): Boolean? {
         val classSectionObjectId = getClassSectionObjectId(classSectionId)?: return null
         val classSection = classSections.findOneById(classSectionObjectId)?: return null
-        val quizObjectId = try { ObjectId(classSectionId) } catch (e: Exception) { null }?: return null
+        val quizObjectId = try { ObjectId(quizId) } catch (e: Exception) { null }?: return null
 
         return try {
             classSection.quizIds.add(quizObjectId)

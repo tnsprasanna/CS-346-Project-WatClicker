@@ -3,8 +3,10 @@ package com.backend.data.selection
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import org.bson.types.ObjectId
+import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.insertOne
+import org.litote.kmongo.eq
 
 class MongoSelectionDataSource(
     db: CoroutineDatabase
@@ -18,6 +20,10 @@ class MongoSelectionDataSource(
     override suspend fun getSelectionById(selectionId: String): Selection? {
         val selectionObjectId = getSelectionObjectId(selectionId)?: return null
         return selections.findOneById(selectionObjectId)
+    }
+
+    override suspend fun getSelectionByUserAndQuestionId(userId: String, questionId: String): Selection? {
+        return selections.findOne(and(Selection::questionId eq ObjectId(questionId), Selection::studentId eq ObjectId(userId)) )
     }
 
     override suspend fun createSelection(selection: Selection): Boolean {
