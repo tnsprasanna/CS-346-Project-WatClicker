@@ -322,7 +322,7 @@ fun Route.changeLastName(
                 return@post
             }
 
-            call.respond(HttpStatusCode.OK, "LastName changed to ${request.newFirstName}")
+            call.respond(HttpStatusCode.OK, "LastName changed to ${request.newLastName}")
             return@post
         }
     }
