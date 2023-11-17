@@ -631,28 +631,6 @@ class ApplicationTest {
         }
     }
 
-    @Test
-    fun testGetQuestionById() = testApplication {
-        application {
-            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
-        }
-
-        val requestBody = """
-        {
-            "questionId": "6545433dee61c575f1ea8fe8"
-        }
-        """
-
-        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
-
-        requestBuilder.method = HttpMethod.Delete
-        requestBuilder.url("/getQuestionById")
-        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
-
-        client.delete(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.OK, status)
-        }
-    }
 
 
 
@@ -1112,6 +1090,396 @@ class ApplicationTest {
 
         client.delete(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.MethodNotAllowed, status)
+        }
+    }
+
+    // FINISH TESTING BACKEND
+
+    @Test
+    fun testGetQuestionById() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "questionId": "6545433dee61c575f1ea8fe8"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuestionById")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testCreateQuestion() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+ 	
+        {
+        "quizId": "65559fe931bd4c58d9c8b585",
+        "question": "fave colour?",
+        "options": ["blue", "red", "green"],
+        "answer": 2
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/createQuestion")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testGetResponsesFromQuestion() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "questionId": "6545433dee61c575f1ea8fe8"
+        }   
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getResponsesFromQuestion")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testGetQuizById() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "quizId": "6545450355a422b78e08ad22"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuizById")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testChangeQuizState() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "quizId": "6545450355a422b78e08ad22",
+            "newstate": "OPEN"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeQuizState")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testGetQuizQuestions() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+             "quizId": "6545450355a422b78e08ad22"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuizQuestions")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testGetResponsesForQuestionsInQuiz() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+             "quizId": "6545450355a422b78e08ad22"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getResponsesForQuestionsInQuiz")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testGetClassSectionById() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "classSectionId": "655539a7b1744a4d2e2be477"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getClassSectionById")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testCreateClassSection() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+           "name": "SUSHI"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/getClassSectionById")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testDeleteClassSection() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "classSectionId": "65557c5a7fa68f60179e1e28"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Delete
+        requestBuilder.url("/deleteClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testGetQuizzesInClassSection() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "classSectionId": "65557c5a7fa68f60179e1e28"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuizzesInClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testGetStudentsInClassSection() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "classSectionId": "65557c5a7fa68f60179e1e28"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getStudentsInClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testRemoveStudentFromClassSection() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "classSectionId": "65557c5a7fa68f60179e1e28"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/removeStudentFromClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testChangeClassSectionName() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "classSectionId": "65557c5a7fa68f60179e1e28"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeClassSectionName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionActive() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "classSectionId": "65557c5a7fa68f60179e1e28"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionActive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionInactive() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+          
+        {
+            "classSectionId": "65557c5a7fa68f60179e1e28"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionInactive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
         }
     }
 
