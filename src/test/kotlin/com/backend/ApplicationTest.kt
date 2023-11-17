@@ -42,6 +42,10 @@ class ApplicationTest {
     val classSectionDataSource = MongoClassSectionDataSource(db);
     val selectionDataSource = MongoSelectionDataSource(db);
 
+    // COMMON OBJECT IDS
+    val classSectionIdVar = "6531fc9e13ed7a4cc0bf3bc0"
+    val quizId = "6545450355a422b78e08ad22"
+
     @Test
     fun testRoot() = testApplication {
         application {
@@ -499,7 +503,7 @@ class ApplicationTest {
 
         val requestBody = """
         {
-            "quizId": "6531f3843d115778d99ebc73"
+            "quizId": "$quizId"
         }
         """
 
@@ -523,7 +527,7 @@ class ApplicationTest {
 
         val requestBody = """
         {
-            "quizId": "6531dc554aa6dd5caca90987"
+            "quizId": "dne"
         }
         """
 
@@ -569,7 +573,7 @@ class ApplicationTest {
 
         val requestBody = """
         {
-            "quizId": "6545450355a422b78e08ad22"
+            "quizId": "dne"
         }
         """
 
@@ -1203,7 +1207,7 @@ class ApplicationTest {
         val requestBody = """
           
         {
-            "quizId": "6545450355a422b78e08ad22",
+            "quizId": "$quizId",
             "newstate": "OPEN"
         }
         """
@@ -1228,9 +1232,11 @@ class ApplicationTest {
         val requestBody = """
           
         {
-             "quizId": "6545450355a422b78e08ad22"
+             "quizId": "$quizId"
         }
         """
+
+
 
         val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
 
@@ -1252,7 +1258,7 @@ class ApplicationTest {
         val requestBody = """
           
         {
-             "quizId": "6545450355a422b78e08ad22"
+             "quizId": "$quizId"
         }
         """
 
@@ -1274,9 +1280,8 @@ class ApplicationTest {
         }
 
         val requestBody = """
-          
         {
-            "classSectionId": "655539a7b1744a4d2e2be477"
+        "classSectionId": "$classSectionIdVar"
         }
         """
 
@@ -1288,6 +1293,30 @@ class ApplicationTest {
 
         client.delete(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testGetClassSectionByIdInvalid() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "dne"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getClassSectionById")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
         }
     }
 
@@ -1322,9 +1351,8 @@ class ApplicationTest {
         }
 
         val requestBody = """
-          
         {
-            "classSectionId": "65557c5a7fa68f60179e1e28"
+        "classSectionId": "$classSectionIdVar"
         }
         """
 
@@ -1336,6 +1364,104 @@ class ApplicationTest {
 
         client.delete(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.OK, status)
+            assertEquals("ClassSection Deleted!", bodyAsText())
+
+        }
+    }
+
+    @Test
+    fun testDeleteClassSection2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Delete
+        requestBuilder.url("/deleteClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testDeleteClassSection3() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Delete
+        requestBuilder.url("/deleteClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("User must be a Teacher!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testDeleteClassSection4() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Delete
+        requestBuilder.url("/deleteClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Caller must be the teacher of the classSection!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testDeleteClassSection5() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Delete
+        requestBuilder.url("/deleteClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Unable to delete classSection! Database Error.", bodyAsText())
         }
     }
 
@@ -1346,9 +1472,8 @@ class ApplicationTest {
         }
 
         val requestBody = """
-          
         {
-            "classSectionId": "65557c5a7fa68f60179e1e28"
+        "classSectionId": "$classSectionIdVar"
         }
         """
 
@@ -1364,15 +1489,38 @@ class ApplicationTest {
     }
 
     @Test
+    fun testGetQuizzesInClassSectionInvalid() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "123"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getQuizzesInClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
+        }
+    }
+
+    @Test
     fun testGetStudentsInClassSection() = testApplication {
         application {
             configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
         }
 
         val requestBody = """
-          
         {
-            "classSectionId": "65557c5a7fa68f60179e1e28"
+        "classSectionId": "$classSectionIdVar"
         }
         """
 
@@ -1388,15 +1536,38 @@ class ApplicationTest {
     }
 
     @Test
+    fun testGetStudentsInClassSectionInvalid() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "123"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getStudentsInClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
+        }
+    }
+
+    @Test
     fun testRemoveStudentFromClassSection() = testApplication {
         application {
             configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
         }
 
         val requestBody = """
-          
         {
-            "classSectionId": "65557c5a7fa68f60179e1e28"
+        "classSectionId": "$classSectionIdVar"
         }
         """
 
@@ -1408,8 +1579,130 @@ class ApplicationTest {
 
         client.delete(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.OK, status)
+            assertEquals("Student has been removed from ClassSection!", bodyAsText())
         }
     }
+
+    @Test
+    fun testRemoveStudentFromClassSection2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/removeStudentFromClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("User must be a Teacher!",bodyAsText())
+        }
+    }
+
+    @Test
+    fun testRemoveStudentFromClassSection3() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/removeStudentFromClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testRemoveStudentFromClassSection4() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/removeStudentFromClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Caller must be the teacher of the classSection!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testRemoveStudentFromClassSection5() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/removeStudentFromClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testRemoveStudentFromClassSection6() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/removeStudentFromClassSection")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Unable to remove student from classSection! Database Error.", bodyAsText())
+        }
+    }
+
 
     @Test
     fun testChangeClassSectionName() = testApplication {
@@ -1418,9 +1711,8 @@ class ApplicationTest {
         }
 
         val requestBody = """
-          
         {
-            "classSectionId": "65557c5a7fa68f60179e1e28"
+        "classSectionId": "$classSectionIdVar"
         }
         """
 
@@ -1432,8 +1724,154 @@ class ApplicationTest {
 
         client.delete(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.OK, status)
+            assertEquals("Changed Class Section Name!", bodyAsText())
         }
     }
+
+    @Test
+    fun testChangeClassSectionName2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeClassSectionName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("User must be a Teacher!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testChangeClassSectionName3() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeClassSectionName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testChangeClassSectionName4() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeClassSectionName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Caller must be the teacher of the classSection!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testChangeClassSectionName5() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeClassSectionName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Error in changing name - 1!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testChangeClassSectionName6() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeClassSectionName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Error in changing name - 2!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testChangeClassSectionName7() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeClassSectionName")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Error in changing name - 2!", bodyAsText())
+        }
+    }
+
 
     @Test
     fun testMakeClassSectionActive() = testApplication {
@@ -1442,9 +1880,8 @@ class ApplicationTest {
         }
 
         val requestBody = """
-          
         {
-            "classSectionId": "65557c5a7fa68f60179e1e28"
+        "classSectionId": "$classSectionIdVar"
         }
         """
 
@@ -1456,6 +1893,127 @@ class ApplicationTest {
 
         client.delete(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.OK, status)
+            assertEquals("ClassSection is now active!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionActive0() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionActive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionActive2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionActive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Unable to make ClassSection Active!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionActive3() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionActive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionActive4() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionActive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Caller is not the teacher for this class!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionActive5() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionActive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Unable to parse args!", bodyAsText())
         }
     }
 
@@ -1466,9 +2024,8 @@ class ApplicationTest {
         }
 
         val requestBody = """
-          
         {
-            "classSectionId": "65557c5a7fa68f60179e1e28"
+        "classSectionId": "$classSectionIdVar"
         }
         """
 
@@ -1480,12 +2037,129 @@ class ApplicationTest {
 
         client.delete(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.OK, status)
+            assertEquals("ClassSection is now inactive!", bodyAsText())
         }
     }
 
+    @Test
+    fun testMakeClassSectionInactive2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
 
+        val requestBody = """
+        {
+        "classSectionId": "notfound"
+        }
+        """
 
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
 
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionInactive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("ClassSection not found!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionInactive3() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "notfound"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionInactive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("User must be a Teacher!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionInactive4() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "notfound"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionInactive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Caller must be the teacher of the classSection!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionInactive5() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "notfound"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionInactive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Unable to make ClassSection Inactive!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testMakeClassSectionInactive6() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "notfound"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionInactive")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.delete(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Unable to make ClassSection Inactive!", bodyAsText())
+        }
+    }
 
 
 
