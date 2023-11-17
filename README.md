@@ -46,6 +46,15 @@ iClicker App:
 - Completed majority of remaining frontend APIs
 - Created additional backend APIs, such as the ability to get responses from questions and quizzes, and tabulate scores
 - Modified backend APIs based on broken tests
+- Developed quiz UI
+- Added class section join code UI for professors
+- Seperate student and professor UI
+- Add radiobutton for student/teacher when creating a new account
+- Delete question and delete quiz abilties introduced
+- Closed quizzes are greyed out
+- Search functionaility for classes and quizzes UI
+- Create quiz UI
+- Change quiz state for teachers possible (only teachers)
 
 ## Project Documents
 Project proposal: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Project-Proposal
