@@ -6,7 +6,6 @@ import com.backend.data.classSection.ClassSectionDataSource
 import com.backend.data.questions.QuestionDataSource
 import com.backend.data.quiz.QuizDataSource
 import com.backend.data.requests.*
-import com.backend.data.requests.GetQuizQuestionIdsRequest
 import com.backend.data.responses.*
 import com.backend.data.user.UserDataSource
 import io.ktor.http.*
@@ -15,8 +14,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.bson.types.ObjectId
-import java.lang.constant.ConstantDescs.NULL
-import java.util.UUID
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 
@@ -258,6 +255,32 @@ fun Route.getQuizQuestions(
         call.respond(
             status = HttpStatusCode.OK,
             message = QuestionListResponse(quizQuestionsRespList)
+        )
+    }
+}
+
+fun Route.getResponsesForQuestionsInQuiz(
+    quizDataSource: QuizDataSource,
+    questionDataSource: QuestionDataSource
+) {
+    get("getResponsesForQuestionsInQuiz") {
+        val request = kotlin.runCatching { call.receiveNullable<QuizIdRequest>() }.getOrNull() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@get
+        }
+
+        val quiz = quizDataSource.getQuizById(request.quizId)?: kotlin.run {
+            call.respond(HttpStatusCode.Conflict, "Quiz not found!")
+            return@get
+        }
+
+        val quizQuestionObjsList = quizDataSource.getQuizQuestions(request.quizId).filterNotNull();
+
+        val quizResponsesList = quizQuestionObjsList.map{question -> questionDataSource.getResponsesFromQuestion(question.id.toString())?.responses }
+
+        call.respond(
+            status = HttpStatusCode.OK,
+            message = ResponseListResponse(quizResponsesList)
         )
     }
 }
