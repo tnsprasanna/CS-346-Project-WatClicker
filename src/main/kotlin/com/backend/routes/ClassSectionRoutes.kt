@@ -83,7 +83,7 @@ fun Route.createClassSection(
                 teacherId = user.id,
                 quizIds = mutableListOf<ObjectId>(),
                 joinCode = (1..8).map { ('a'..'z').random() }.joinToString(""),
-                isJoinable = false
+                isJoinable = request.isJoinable
             )
 
             val res = classSectionDataSource.createClassSection(classSection)

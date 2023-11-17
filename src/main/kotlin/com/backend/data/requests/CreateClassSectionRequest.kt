@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateClassSectionRequest(
-    val name: String
+    val name: String,
+    val isJoinable: Boolean,
 )
