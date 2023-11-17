@@ -5,6 +5,7 @@ import com.backend.data.user.UserDataSource
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import org.bson.types.ObjectId
+import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 
@@ -26,14 +27,25 @@ class MongoQuestionDataSource(
         return questions.insertOne(question).wasAcknowledged()
     }
 
+    override suspend fun editQuestion(questionId: String, question: String, options: MutableList<String>, answer: Int): Boolean? {
+        val questionObjectId = getQuestionObjectId(questionId)?: return null
+        val oldQuestion = questions.findOneById(questionObjectId)?: return null
+
+        oldQuestion.question = question;
+        oldQuestion.options = options;
+        oldQuestion.answer = answer;
+        oldQuestion.responses = MutableList(options.size) {0}
+        return questions.updateOneById(questionObjectId, oldQuestion).wasAcknowledged();
+    }
+
     override suspend fun deleteQuestion(questionId: String): Boolean {
         val questionObjectId = getQuestionObjectId(questionId)?: return false
         return questions.deleteOneById(questionObjectId).wasAcknowledged()
     }
 
-    override suspend fun getResponsesFromQuestion(questionId: String): Question? {
+    override suspend fun getResponsesFromQuestion(questionId: String): MutableList<Int>? {
         val questionObjectId = getQuestionObjectId(questionId)?: return null
-        return questions.findOneById(questionObjectId)
+        return questions.findOneById(questionObjectId)?.responses
     }
 
     override suspend fun addStat(questionId: String, selectedOption: Int): Boolean? {

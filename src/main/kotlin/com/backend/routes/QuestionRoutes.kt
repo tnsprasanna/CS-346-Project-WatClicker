@@ -104,7 +104,7 @@ fun Route.createQuestion(
 
             val question = Question(
                 question = request.question,
-                options =request.options.toMutableList(),
+                options = request.options.toMutableList(),
                 responses =  MutableList(request.options.size) {0},
                 answer = request.answer,
                 selections = mutableListOf<ObjectId>()
@@ -122,6 +122,56 @@ fun Route.createQuestion(
             }
 
             call.respond(HttpStatusCode.OK, "Created Question.")
+            return@post
+        }
+    }
+}
+
+fun Route.editQuestion(
+    userDataSource: UserDataSource,
+    questionDataSource: QuestionDataSource
+) {
+    authenticate {
+        post("editQuestion") {
+            val principal = call.principal<JWTPrincipal>()
+
+            val userId = principal?.getClaim("userId", String::class)?: kotlin.run{
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                return@post
+            }
+
+            val request = kotlin.runCatching { call.receiveNullable<EditQuestionRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@post
+            }
+
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@post
+            }
+
+            if (user.role != Constants.TEACHER_ROLE) {
+                call.respond(HttpStatusCode.Conflict, "User must be a Teacher!")
+                return@post
+            }
+
+            val existingQuestion = questionDataSource.getQuestionById(request.questionId)
+            if (existingQuestion == null) {
+                call.respond(HttpStatusCode.Conflict, "Question does not exist!")
+                return@post
+            }
+
+            val res1 = questionDataSource.editQuestion(request.questionId, request.question, request.options.toMutableList(), request.answer)?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "Database error!")
+                return@post
+            }
+
+            if (!res1) {
+                call.respond(HttpStatusCode.Conflict, "Unable to edit Question - Could not edit!")
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, "Edited Question.")
             return@post
         }
     }

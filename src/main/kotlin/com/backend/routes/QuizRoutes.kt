@@ -276,7 +276,7 @@ fun Route.getResponsesForQuestionsInQuiz(
 
         val quizQuestionObjsList = quizDataSource.getQuizQuestions(request.quizId).filterNotNull();
 
-        val quizResponsesList = quizQuestionObjsList.map{question -> questionDataSource.getResponsesFromQuestion(question.id.toString())?.responses }
+        val quizResponsesList = quizQuestionObjsList.map{question -> questionDataSource.getResponsesFromQuestion(question.id.toString()) }
 
         call.respond(
             status = HttpStatusCode.OK,

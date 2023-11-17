@@ -44,6 +44,7 @@ fun Application.configureRouting(
         createQuestion(userDataSource, classSectionDataSource, quizDataSource, questionDataSource)
         deleteQuestion(userDataSource, classSectionDataSource, quizDataSource, questionDataSource)
         getResponsesFromQuestion(questionDataSource)
+        editQuestion(userDataSource, questionDataSource)
         // APIs for Editing Quiz Fields
 
         createQuiz(userDataSource, classSectionDataSource, quizDataSource)
