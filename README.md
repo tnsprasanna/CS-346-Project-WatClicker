@@ -66,6 +66,8 @@ Release for sprint 1: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sp
 
 Release for Sprint 2: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sprint2
 
+Release for Sprint 3: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sprint3
+
 
 ## Link to frontend repository
 https://git.uwaterloo.ca/v56gupta1/cs346-frontend
