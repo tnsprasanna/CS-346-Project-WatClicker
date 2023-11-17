@@ -261,26 +261,47 @@ fun Route.getQuizQuestions(
 
 fun Route.getResponsesForQuestionsInQuiz(
     quizDataSource: QuizDataSource,
+    userDataSource: UserDataSource,
     questionDataSource: QuestionDataSource
 ) {
-    get("getResponsesForQuestionsInQuiz") {
-        val request = kotlin.runCatching { call.receiveNullable<QuizIdRequest>() }.getOrNull() ?: kotlin.run {
-            call.respond(HttpStatusCode.BadRequest)
-            return@get
+        authenticate {
+            get("getResponsesForQuestionsInQuiz") {
+                val principal = call.principal<JWTPrincipal>()
+
+                val userId = principal?.getClaim("userId", String::class)?: kotlin.run{
+                    call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                    return@get
+                }
+
+                val user = userDataSource.getUserById(userId) ?: kotlin.run {
+                    call.respond(HttpStatusCode.Conflict, "User not found!")
+                    return@get
+                }
+
+
+                val request = kotlin.runCatching { call.receiveNullable<QuizIdRequest>() }.getOrNull() ?: kotlin.run {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+                val quiz = quizDataSource.getQuizById(request.quizId)?: kotlin.run {
+                    call.respond(HttpStatusCode.Conflict, "Quiz not found!")
+                    return@get
+                }
+
+                if (quiz.state != Constants.FINISHED && user.role == Constants.STUDENT_ROLE) {
+                    call.respond(HttpStatusCode.Conflict, "Responses not available!")
+                    return@get
+                }
+
+                val quizQuestionObjsList = quizDataSource.getQuizQuestions(request.quizId).filterNotNull();
+
+                val quizResponsesList = quizQuestionObjsList.map{question -> questionDataSource.getResponsesFromQuestion(question.id.toString()) }
+
+                call.respond(
+                    status = HttpStatusCode.OK,
+                    message = ResponseListResponse(quizResponsesList)
+                )
+            }
         }
-
-        val quiz = quizDataSource.getQuizById(request.quizId)?: kotlin.run {
-            call.respond(HttpStatusCode.Conflict, "Quiz not found!")
-            return@get
-        }
-
-        val quizQuestionObjsList = quizDataSource.getQuizQuestions(request.quizId).filterNotNull();
-
-        val quizResponsesList = quizQuestionObjsList.map{question -> questionDataSource.getResponsesFromQuestion(question.id.toString()) }
-
-        call.respond(
-            status = HttpStatusCode.OK,
-            message = ResponseListResponse(quizResponsesList)
-        )
-    }
 }

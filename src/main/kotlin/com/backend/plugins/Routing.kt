@@ -52,7 +52,7 @@ fun Application.configureRouting(
         changeQuizState(userDataSource, classSectionDataSource, quizDataSource)
         deleteQuiz(userDataSource, classSectionDataSource, quizDataSource)
         getQuizQuestions(quizDataSource, questionDataSource)
-        getResponsesForQuestionsInQuiz(quizDataSource, questionDataSource)
+        getResponsesForQuestionsInQuiz(quizDataSource, userDataSource, questionDataSource)
 
         getUserById(userDataSource)
         isStudentFromId(userDataSource)
