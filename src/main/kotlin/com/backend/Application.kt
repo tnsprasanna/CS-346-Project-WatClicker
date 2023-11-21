@@ -1,6 +1,7 @@
 package com.backend
 
 import User
+import com.`346Proj`.plugins.configureSockets
 import com.backend.data.classSection.MongoClassSectionDataSource
 import com.backend.data.questions.MongoQuestionDataSource
 import com.backend.data.quiz.MongoQuizDataSource
@@ -44,7 +45,7 @@ fun Application.module() {
     )
     val hashingService = SHA256HashingService()
 
-
+    configureSockets()
     configureSerialization()
     configureMonitoring()
     configureSecurity(tokenConfig)
