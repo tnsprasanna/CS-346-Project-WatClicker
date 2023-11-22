@@ -44,7 +44,7 @@ fun Application.module() {
         secret = System.getenv("JWT_SECRET")?: "JF8sFEEzZw"
     )
     val hashingService = SHA256HashingService()
-
+    
     configureSockets()
     configureSerialization()
     configureMonitoring()
