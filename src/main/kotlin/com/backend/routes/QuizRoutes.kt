@@ -305,3 +305,58 @@ fun Route.getResponsesForQuestionsInQuiz(
             }
         }
 }
+
+fun Route.changeQuizName(
+    userDataSource: UserDataSource,
+    classSectionDataSource: ClassSectionDataSource,
+    quizDataSource: QuizDataSource
+) {
+    authenticate {
+        post("changeQuizName") {
+            val principal = call.principal<JWTPrincipal>()
+
+            val userId = principal?.getClaim("userId", String::class)?: kotlin.run{
+                call.respond(HttpStatusCode.BadRequest, "UserId not retrievable!");
+                return@post
+            }
+
+            val request = kotlin.runCatching { call.receiveNullable<ChangeQuizNameRequest>() }.getOrNull() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
+                return@post
+            }
+
+            val user = userDataSource.getUserById(userId) ?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "User not found!")
+                return@post
+            }
+
+            if (user.role != Constants.TEACHER_ROLE) {
+                call.respond(HttpStatusCode.Conflict, "User must be a Teacher!")
+                return@post
+            }
+
+            val quiz = quizDataSource.getQuizById(request.quizId)?: kotlin.run{
+                call.respond(HttpStatusCode.Conflict, "Quiz not found!")
+                return@post
+            }
+
+            val classSection = classSectionDataSource.getClassSectionById(quiz.classSectionId.toString())?: kotlin.run {
+                call.respond(HttpStatusCode.Conflict, "ClassSection not found!")
+                return@post
+            }
+
+            if (classSection.teacherId.toString() != userId) {
+                call.respond(HttpStatusCode.Conflict, "User is not the teacher of the class that this quiz is a part of!")
+                return@post
+            }
+
+            val res = quizDataSource.changeQuizName(request.quizId, request.newName)
+            if (!res) {
+                call.respond(HttpStatusCode.Conflict, "Unable change the quiz name!");
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, "Quiz Name Changed!");
+        }
+    }
+}
