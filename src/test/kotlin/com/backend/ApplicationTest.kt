@@ -26,12 +26,12 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class ApplicationTest {
-    val mongoUserName = "s3maniva"
-    val mongoPWD = "test"
+    val mongoUserName = "backendTest"
+    val mongoPWD = "nLvf7GtBjzAmNdUY"
     val mongoDBName = "db2"
 
     val db = KMongo.createClient(
-        connectionString = "mongodb+srv://s3maniva:test@cluster0.gip11qi.mongodb.net/?retryWrites=true&w=majority"
+        connectionString = "mongodb+srv://$mongoUserName:$mongoPWD@cluster0.gip11qi.mongodb.net/$mongoDBName?retryWrites=true&w=majority"
     ).coroutine
         .getDatabase(mongoDBName)
 
@@ -204,7 +204,7 @@ class ApplicationTest {
         "username": "$username",
         "password": "password",
         "role": "STUDENT",
-        "firstname": "Sineha",
+        "firstname": "KobeBryant",
         "lastname": "Mani"
     }
     """
