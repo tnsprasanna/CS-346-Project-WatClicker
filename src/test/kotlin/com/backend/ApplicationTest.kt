@@ -2334,8 +2334,134 @@ class ApplicationTest {
             assertEquals(HttpStatusCode.Conflict, status)
         }
     }
+// SELECTION
 
+    @Test
+    fun testGetSelectionById() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
 
+        val requestBody = """
+        {
+        "selectionId": "6557d094ca5e000bac363b23"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getSelectionById")
+        val jwtToken = obtainJwtTokenStudent(client)
+        requestBuilder.header("Authorization", "Bearer $jwtToken")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.get(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
+    fun testGetSelectionByUserAndQuestionId() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "questionId": "65604c99538196181f792f63"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getSelectionByUserAndQuestionId")
+        val jwtToken = obtainJwtTokenStudent(client)
+        requestBuilder.header("Authorization", "Bearer $jwtToken")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.get(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.BadRequest, status)
+        }
+    }
+
+    @Test
+    fun testCreateSelection() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "questionId": "65604c99538196181f792f63",
+        "selectedOption": 1
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/createSelection")
+        val jwtToken = obtainJwtTokenStudent(client)
+        requestBuilder.header("Authorization", "Bearer $jwtToken")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.BadRequest, status)
+        }
+    }
+
+    @Test
+    fun testDeleteSelection() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "selectionId": "dne"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/deleteSelection")
+        val jwtToken = obtainJwtTokenStudent(client)
+        requestBuilder.header("Authorization", "Bearer $jwtToken")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.BadRequest, status)
+        }
+    }
+
+    @Test
+    fun testEditSelection() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "selectionId": "6557d094ca5e000bac363b23",
+        "newOption": 0
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/editSelection")
+        val jwtToken = obtainJwtTokenStudent(client)
+        requestBuilder.header("Authorization", "Bearer $jwtToken")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+        }
+    }
 
 
 //
