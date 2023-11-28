@@ -16,20 +16,44 @@ import kotlinx.coroutines.launch
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import com.backend.data.selection.MongoSelectionDataSource
+import org.litote.kmongo.coroutine.CoroutineDatabase
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
 fun Application.module() {
-    val mongoUserName: String = System.getenv("MONGODB_USERNAME")?: "backend"
-    val mongoPWD = System.getenv("MONGODB_PWD")?: "3Vdek4PjNBEhu00O"
-    val mongoDBName = System.getenv("MONGODB_NAME")?: "db1"
 
-    val db = KMongo.createClient(
-        connectionString = "mongodb+srv://$mongoUserName:$mongoPWD@cluster0.3mqtfy8.mongodb.net/$mongoDBName?retryWrites=true&w=majority"
-    ).coroutine
-        .getDatabase(mongoDBName)
+    val testing = System.getProperty("ktor.environment") == "test"
+
+    val mongoUserName: String
+    val mongoPWD: String
+    val mongoDBName: String
+    val db: CoroutineDatabase
+
+    if (testing) {
+        // Configuration for test database
+        mongoUserName = System.getenv("MONGODB_TEST_USERNAME") ?: "backendTest"
+        mongoPWD = System.getenv("MONGODB_TEST_PWD") ?: "nLvf7GtBjzAmNdUY"
+        mongoDBName = System.getenv("MONGODB_TEST_NAME") ?: "db2"
+
+        db = KMongo.createClient(
+            connectionString = "mongodb+srv://$mongoUserName:$mongoPWD@cluster0.gip11qi.mongodb.net/$mongoDBName?retryWrites=true&w=majority"
+        ).coroutine
+            .getDatabase(mongoDBName)
+
+
+    } else {
+        // Configuration for regular database
+        mongoUserName = System.getenv("MONGODB_USERNAME") ?: "backend"
+        mongoPWD = System.getenv("MONGODB_PWD") ?: "3Vdek4PjNBEhu00O"
+        mongoDBName = System.getenv("MONGODB_NAME") ?: "db1"
+
+        db = KMongo.createClient(
+            connectionString = "mongodb+srv://$mongoUserName:$mongoPWD@cluster0.3mqtfy8.mongodb.net/$mongoDBName?retryWrites=true&w=majority"
+        ).coroutine
+            .getDatabase(mongoDBName)
+    }
 
     val userDataSource = MongoUserDataSource(db);
     val quizDataSource = MongoQuizDataSource(db);
@@ -44,7 +68,6 @@ fun Application.module() {
         secret = System.getenv("JWT_SECRET")?: "JF8sFEEzZw"
     )
     val hashingService = SHA256HashingService()
-    
     configureSockets()
     configureSerialization()
     configureMonitoring()
