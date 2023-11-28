@@ -25,15 +25,16 @@ import java.util.UUID
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class ApplicationTest {
-    val mongoUserName = System.getenv("MONGODB_TEST_USERNAME") ?: "backendTest"
-    val mongoPWD = System.getenv("MONGODB_TEST_PWD") ?: "nLvf7GtBjzAmNdUY"
-    val mongoDBName = System.getenv("MONGODB_TEST_NAME") ?: "db2"
+class Testing {
+    val mongoUserName = "backendTest"
+    val mongoPWD = "nLvf7GtBjzAmNdUY"
+    val mongoDBName = "db2"
 
     val db = KMongo.createClient(
         connectionString = "mongodb+srv://$mongoUserName:$mongoPWD@cluster0.gip11qi.mongodb.net/$mongoDBName?retryWrites=true&w=majority"
     ).coroutine
         .getDatabase(mongoDBName)
+
 
     val userDataSource = MongoUserDataSource(db);
     val quizDataSource = MongoQuizDataSource(db);
@@ -203,8 +204,8 @@ class ApplicationTest {
         "username": "$username",
         "password": "password",
         "role": "STUDENT",
-        "firstname": "Chicken",
-        "lastname": "Nugget"
+        "firstname": "Tim",
+        "lastname": "Hortons"
     }
     """
 
