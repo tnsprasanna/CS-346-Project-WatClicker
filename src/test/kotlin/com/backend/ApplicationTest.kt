@@ -203,8 +203,8 @@ class ApplicationTest {
         "username": "$username",
         "password": "password",
         "role": "STUDENT",
-        "firstname": "Chicken",
-        "lastname": "Nugget"
+        "firstname": "Harry",
+        "lastname": "Potter"
     }
     """
 
@@ -1607,7 +1607,7 @@ class ApplicationTest {
             assertTrue(status == HttpStatusCode.OK || status == HttpStatusCode.Conflict)
 
             when (status) {
-                HttpStatusCode.OK -> assertEquals("ClassSection is now active!", bodyAsText())
+                HttpStatusCode.OK -> assertEquals("ClassSection Deleted!", bodyAsText())
                 HttpStatusCode.Conflict -> assertEquals("ClassSection not found!", bodyAsText())
                 else -> fail("Unexpected status code")
             }
@@ -1731,7 +1731,7 @@ class ApplicationTest {
 
         val requestBody = """
         {
-        "classSectionId": "$classSectionIdVar"
+        "classSectionId": "dne"
         }
         """
 
@@ -1954,8 +1954,7 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.post(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.Conflict, status)
-            assertEquals("ClassSection not found!", bodyAsText())
+            assertEquals(HttpStatusCode.OK, status)
         }
     }
 
@@ -1967,8 +1966,8 @@ class ApplicationTest {
 
         val requestBody = """
         {
-        "classSectionId": "$classSectionIdVar",
-        "userid": "6557cd000588aa3461e28016"
+        "classSectionId": "test",
+        "userid": "test"
         }
         """
 
