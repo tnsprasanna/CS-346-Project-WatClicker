@@ -761,43 +761,9 @@ class ApplicationTest {
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.delete(builder = requestBuilder).apply {
-            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(HttpStatusCode.Conflict, status)
         }
     }
-
-
-
-
-
-
-
-    /* TESTS FOR SPRINT 2 */
-    /*
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     */
 
 
     @Test
@@ -2458,6 +2424,32 @@ class ApplicationTest {
 
         client.post(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.Conflict, status)
+        }
+    }
+
+    @Test
+    fun testChangeQuizName() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "quizId": "$fixedquizid",
+        "newName": "QUIZ OF THE WEEK"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/changeQuizName")
+        val jwtToken = obtainJwtToken(client)
+        requestBuilder.header("Authorization", "Bearer $jwtToken")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
         }
     }
 
