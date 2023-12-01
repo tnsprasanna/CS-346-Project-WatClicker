@@ -56,6 +56,20 @@ iClicker App:
 - Created quiz UI
 - Change quiz state for teachers is now possible (only teachers)
 
+## Tasks completed for Sprint 3
+- Completed thorough unit testing of the backend (utilized mocking)
+- Established a name for our app (WatClicker)
+- Created a logo, brand banner and integrated to the frontend
+- Modified UI style (cursor change on hover, new buttons, main page + class page changes, animation to log in)
+- Explored websockets for real-time updating from the server
+- Implemented polling (calling APIs at regular intervals) for real-time updating
+- Added error checking on the frontend (error texts, pop ups)
+- Main frontend UI file was restructured into several files for readability
+- Editing a class, quiz, question were completed
+- Completed API for editing a student's selection
+- Fixed bugs and reamining features to be implemented from previous sprint
+
+
 ## Project Documents
 Project proposal: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Project-Proposal
 
