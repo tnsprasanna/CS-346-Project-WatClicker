@@ -56,7 +56,7 @@ iClicker App:
 - Created quiz UI
 - Change quiz state for teachers is now possible (only teachers)
 
-## Tasks completed for Sprint 3
+## Tasks completed for Sprint 4
 - Completed thorough unit testing of the backend (utilized mocking)
 - Established a name for our app (WatClicker)
 - Created a logo, brand banner and integrated to the frontend
