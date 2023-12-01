@@ -2378,6 +2378,31 @@ class ApplicationTest {
     }
 
     @Test
+    fun testGetSelectionByUserAndQuestionId2() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "questionId": "6557d7efca5e000bac363b27"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Get
+        requestBuilder.url("/getSelectionByUserAndQuestionId")
+        val jwtToken = obtainJwtToken2(client)
+        requestBuilder.header("Authorization", "Bearer $jwtToken")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.get(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+    }
+
+    @Test
     fun testCreateSelection() = testApplication {
         application {
             configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
