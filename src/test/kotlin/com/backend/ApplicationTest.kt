@@ -2222,6 +2222,32 @@ class ApplicationTest {
         }
     }
 
+    @Test
+    fun testMakeClassSectionActive7() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+        "classSectionId": "$classSectionIdVar"
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/makeClassSectionActive")
+        val jwtToken = obtainJwtToken2(client)
+        requestBuilder.header("Authorization", "Bearer $jwtToken")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("Caller is not the teacher for this class!", bodyAsText())
+        }
+    }
+
 
     @Test
     fun testMakeClassSectionInactive() = testApplication {
