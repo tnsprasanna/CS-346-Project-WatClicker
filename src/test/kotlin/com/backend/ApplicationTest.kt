@@ -2126,7 +2126,7 @@ class ApplicationTest {
 
         val requestBody = """
         {
-        "classSectionId": "65604ce3538196181f792f64"
+        "classSectionId": "$classSectionIdVar"
         }
         """
 
@@ -2140,7 +2140,7 @@ class ApplicationTest {
 
         client.post(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.OK, status)
-            assertEquals("ClassSection is now active!", bodyAsText())
+            assertEquals("ClassSection is now Active!", bodyAsText())
         }
     }
 
@@ -2418,12 +2418,13 @@ class ApplicationTest {
 
         requestBuilder.method = HttpMethod.Post
         requestBuilder.url("/editSelection")
-        val jwtToken = obtainJwtTokenStudent(client)
+        val jwtToken = obtainJwtToken(client)
         requestBuilder.header("Authorization", "Bearer $jwtToken")
         requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
 
         client.post(builder = requestBuilder).apply {
             assertEquals(HttpStatusCode.Conflict, status)
+            assertEquals("User must be a student!", bodyAsText())
         }
     }
 
