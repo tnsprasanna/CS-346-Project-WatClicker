@@ -103,4 +103,11 @@ class MongoQuizDataSource(
         return quizzes.updateOneById(quizObjectId, quiz).wasAcknowledged()
     }
 
+    override suspend fun gradesForAllStudents(quizId: String): String? {
+        return "NEED_TO_IMPLEMENT"
+    }
+
+    override suspend fun gradesForStudent(quizId: String, studentId: String): String? {
+        return "NEED_TO_IMPLEMENT"
+    }
 }

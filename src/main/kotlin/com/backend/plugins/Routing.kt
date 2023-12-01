@@ -90,6 +90,10 @@ fun Application.configureRouting(
         deleteSelection(selectionDataSource, userDataSource, questionDataSource)
         editSelection(selectionDataSource, userDataSource, questionDataSource)
 
+        teacherGetGradesForClass(userDataSource, classSectionDataSource, quizDataSource, questionDataSource)
+//        teacherGetGradesForQuiz(userDataSource, classSectionDataSource, quizDataSource, questionDataSource)
+        studentGetGradesForClass(userDataSource, classSectionDataSource, quizDataSource, questionDataSource)
+//        studentsGetGradesForQuiz(userDataSource, classSectionDataSource, quizDataSource, questionDataSource)
 
         get("") {
             call.respond(HttpStatusCode.OK, "CS 346 Proj Backend is Running!")

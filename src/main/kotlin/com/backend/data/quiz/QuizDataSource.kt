@@ -24,4 +24,8 @@ interface QuizDataSource {
 
         suspend fun changeQuizName(quizId: String, newName: String): Boolean
 
+        suspend fun gradesForAllStudents(quizId: String): String?
+
+        suspend fun gradesForStudent(quizId: String, studentId: String): String?
+
 }

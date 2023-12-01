@@ -43,6 +43,10 @@ interface ClassSectionDataSource {
 
     suspend fun changeClassSectionName(classSectionId: String, newName: String): Boolean?
 
+    suspend fun gradesForAllStudents(classSectionId: String): String?
+
+    suspend fun gradesForStudent(classSectionId: String, studentId: String): String?
+
 }
 
 
