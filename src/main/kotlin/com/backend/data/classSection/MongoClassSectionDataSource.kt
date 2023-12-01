@@ -6,6 +6,8 @@ import org.bson.types.ObjectId
 import org.litote.kmongo.eq
 import User
 import Quiz
+import com.backend.data.Constants
+import com.backend.data.selection.Selection
 import org.litote.kmongo.coroutine.insertOne
 
 class MongoClassSectionDataSource(
@@ -14,6 +16,7 @@ class MongoClassSectionDataSource(
     private val classSections = db.getCollection<ClassSection>()
     private val users = db.getCollection<User>()
     private val quizzes = db.getCollection<Quiz>()
+    private val selections = db.getCollection<Selection>()
 
     private fun getClassSectionObjectId(classSectionId: String): ObjectId? {
         return try { ObjectId(classSectionId) } catch (e: Exception) { null }
@@ -181,4 +184,82 @@ class MongoClassSectionDataSource(
         return classSections.updateOneById(classSectionObjectId, classSection).wasAcknowledged()
     }
 
+    override suspend fun gradesForAllStudents(classSectionId: String): String? {
+        val classSectionObjectId = getClassSectionObjectId(classSectionId)?: return null
+        val classSectionObject =  classSections.findOneById(classSectionObjectId)?: return null
+
+        val quizNames: MutableList<String> = mutableListOf()
+        val grades: HashMap<String, MutableList<Double>> = HashMap()
+
+        for (studentId in classSectionObject.studentIds) {
+            for (quizId in classSectionObject.quizIds) {
+                val quizObject = quizzes.findOneById(quizId)?: return null
+                quizNames.add(quizObject.name)
+
+                if (!grades.containsKey(studentId.toString())) {
+                    grades[studentId.toString()] = mutableListOf()
+                }
+
+                if (quizObject.state != "Finished") {
+                    grades[studentId.toString()]?.add(-1.0)
+                    continue
+                }
+
+                var numQuestions = 0.0
+                var numCorrect = 0.0
+
+                for (questionId in quizObject.questionIds) {
+                    val selectionObject = selections.findOne(
+                        Selection::studentId eq studentId, Selection::questionId eq questionId)?: continue
+
+                    numQuestions += 1.0
+                    numCorrect += if (selectionObject.isCorrect) 1.0 else 0.0
+                }
+
+                grades[studentId.toString()]?.add(numCorrect / numQuestions)
+            }
+        }
+
+        return Constants.generateCSVForList(grades)
+    }
+
+    override suspend fun gradesForStudent(classSectionId: String, studentId: String): String? {
+        val classSectionObjectId = getClassSectionObjectId(classSectionId) ?: return null
+        val classSectionObject = classSections.findOneById(classSectionObjectId) ?: return null
+
+        val studentObjectId = ObjectId(studentId)
+
+        val quizNames: MutableList<String> = mutableListOf()
+        val grades: HashMap<String, MutableList<Double>> = HashMap()
+
+        for (quizId in classSectionObject.quizIds) {
+            val quizObject = quizzes.findOneById(quizId) ?: return null
+            quizNames.add(quizObject.name)
+
+            if (!grades.containsKey(studentId)) {
+                grades[studentId] = mutableListOf()
+            }
+
+            if (quizObject.state != "Finished") {
+                grades[studentId]?.add(-1.0)
+                continue
+            }
+
+            var numQuestions = 0.0
+            var numCorrect = 0.0
+
+            for (questionId in quizObject.questionIds) {
+                val selectionObject = selections.findOne(
+                    Selection::studentId eq studentObjectId, Selection::questionId eq questionId
+                ) ?: continue
+
+                numQuestions += 1.0
+                numCorrect += if (selectionObject.isCorrect) 1.0 else 0.0
+            }
+
+            grades[studentId]?.add(numCorrect / numQuestions)
+        }
+
+        return Constants.generateCSVForList(grades)
+    }
 }
