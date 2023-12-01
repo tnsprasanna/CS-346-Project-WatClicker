@@ -2586,6 +2586,35 @@ class ApplicationTest {
     }
 
     @Test
+    fun testEditQuestion() = testApplication {
+        application {
+            configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
+        }
+
+        val requestBody = """
+        {
+            "questionId": "6557d7efca5e000bac363b28",
+            "question": "TEST",
+            "options": ["blue", "red", "green"],
+            "answer": 0,
+        }
+        """
+
+        val requestBuilder: HttpRequestBuilder = HttpRequestBuilder();
+
+        requestBuilder.method = HttpMethod.Post
+        requestBuilder.url("/editQuestion")
+        val jwtToken = obtainJwtToken(client)
+        requestBuilder.header("Authorization", "Bearer $jwtToken")
+        requestBuilder.setBody(TextContent(requestBody, ContentType.Application.Json))
+
+        client.post(builder = requestBuilder).apply {
+            assertEquals(HttpStatusCode.BadRequest, status)
+            assertEquals("Unable to parse args!", bodyAsText())
+        }
+    }
+
+    @Test
     fun testChangeQuizName() = testApplication {
         application {
             configureRouting(userDataSource, questionDataSource, quizDataSource, hashingService, tokenService, tokenConfig, classSectionDataSource, selectionDataSource)
