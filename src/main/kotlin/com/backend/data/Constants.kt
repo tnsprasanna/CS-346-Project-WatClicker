@@ -10,18 +10,22 @@ class Constants {
         val QUIZ_STATES = arrayOf(HIDDEN, OPEN, CLOSED, FINISHED);
 
         @JvmStatic
-        fun generateCSVForList(data: Map<String, MutableList<Double>>): String {
+        fun generateCSVForList(colTitles: MutableList<String>, data: Map<String, MutableList<String>>): String {
             val csvStringBuilder = StringBuilder()
+
+            for (colTitle in colTitles) {
+                csvStringBuilder.append("$colTitle, ")
+            }
+            csvStringBuilder.appendLine("")
 
             for ((username, values) in data) {
                 csvStringBuilder.append("$username, ")
 
                 for (value in values) {
-                    val transformedValue = if (value == -1.0) "X" else "%.2f%%".format(value * 100)
-                    csvStringBuilder.append("$transformedValue, ")
+                    csvStringBuilder.append("$value, ")
                 }
 
-                csvStringBuilder.appendln(",")
+                csvStringBuilder.appendLine("")
             }
 
             return csvStringBuilder.toString()
@@ -36,6 +40,18 @@ class Constants {
             }
 
             return csvStringBuilder.toString()
+        }
+
+        @JvmStatic
+        fun getPercentage(numerator: Double, denominator: Double): String {
+            if (denominator == 0.0) {
+                return "X"
+            }
+
+            val percentage = (numerator / denominator) * 100
+            val roundedPercentage = String.format("%.2f", percentage)
+
+            return "$roundedPercentage%"
         }
     }
 }

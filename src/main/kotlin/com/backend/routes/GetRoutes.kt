@@ -737,15 +737,7 @@ fun Route.joinClassSection(
                 return@post
             }
 
-            var studentInClass = false;
-            for (classSectionId in user.classSectionList) {
-                if (classSectionId.toString() == classSection.id.toString()) {
-                    studentInClass = true
-                    break
-                }
-            }
-
-            if (studentInClass) {
+            if (user.classSectionList.contains(classSection.id)) {
                 call.respond(HttpStatusCode.Conflict, "User already enrolled in this Class!")
                 return@post
             }

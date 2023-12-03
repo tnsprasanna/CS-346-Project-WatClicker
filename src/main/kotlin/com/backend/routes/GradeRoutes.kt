@@ -50,6 +50,9 @@ fun Route.teacherGetGradesForClass(
                 return@get
             }
 
+            println("REACHED")
+            println("GOING TO GET ALL GRADES")
+
             val gradesCSV = classSectionDataSource.gradesForAllStudents(request.classSectionId)?: kotlin.run {
                 call.respond(HttpStatusCode.Conflict, "Error getting grades")
                 return@get
