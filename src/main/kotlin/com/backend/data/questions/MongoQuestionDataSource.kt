@@ -1,6 +1,7 @@
 package com.backend.data.questions
 
 import Question
+import com.backend.data.selection.Selection
 import com.backend.data.user.UserDataSource
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
@@ -13,6 +14,7 @@ class MongoQuestionDataSource(
     db: CoroutineDatabase
 ) : QuestionDataSource {
     private val questions = db.getCollection<Question>()
+    private val selections = db.getCollection<Selection>()
 
     private fun getQuestionObjectId(questionId: String): ObjectId? {
         return try { ObjectId(questionId) } catch (e: Exception) { null }
@@ -35,6 +37,15 @@ class MongoQuestionDataSource(
         oldQuestion.options = options;
         oldQuestion.answer = answer;
         oldQuestion.responses = MutableList(options.size) {0}
+
+        // Update all Selection Models
+        val selectionsList = selections.find(Selection::questionId eq questionObjectId).toList()
+
+        for (selection in selectionsList) {
+            selection.isCorrect = (selection.selectedOption == answer)
+            selections.updateOneById(selection.id, selection)
+        }
+
         return questions.updateOneById(questionObjectId, oldQuestion).wasAcknowledged();
     }
 
