@@ -197,6 +197,7 @@ class MongoClassSectionDataSource(
 
             for (quizId in classSectionObject.quizIds) {
                 val quizObject = quizzes.findOneById(quizId)?: continue
+                if (quizObject.state != Constants.FINISHED) { continue }
 
                 if (!quizNames.contains(quizObject.name)) {
                     quizNames.add(quizObject.name)
@@ -236,6 +237,7 @@ class MongoClassSectionDataSource(
 
         for (quizId in classSectionObject.quizIds) {
             val quizObject = quizzes.findOneById(quizId)?: continue
+            if (quizObject.state != Constants.FINISHED) { continue }
 
             if (!quizNames.contains(quizObject.name)) {
                 quizNames.add(quizObject.name)
