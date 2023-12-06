@@ -9,15 +9,11 @@ Clone this repository using the HTTPS link.
 Open the app on IntelliJ and then use the play button to run the application.
 
 ## Team Members
-Vipasha Gupta - v56gupta@uwaterloo.ca
-
-Prasanna Thallapalli - pthallap@uwaterloo.ca
-
-Tracy Dong - t24dong@uwaterloo.ca
-
-Sineha Manivannan - s3maniva@uwaterloo.ca
-
-Saikrishna Tadepalli - stadepal@uwaterloo.ca
+Vipasha Gupta
+Prasanna Thallapalli
+Tracy Dong
+Sineha Manivannan
+Saikrishna Tadepalli
 
 ## Tasks completed for Sprint 1
 iClicker App:
@@ -78,8 +74,6 @@ iClicker App:
 
 ## Project Documents
 Project proposal: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Project-Proposal
-
-Meeting minutes: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Meeting-Minutes
 
 Requirements: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Requirements
 
