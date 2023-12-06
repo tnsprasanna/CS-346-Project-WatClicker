@@ -9,11 +9,7 @@ Clone this repository using the HTTPS link.
 Open the app on IntelliJ and then use the play button to run the application.
 
 ## Team Members
-Vipasha Gupta
-Prasanna Thallapalli
-Tracy Dong
-Sineha Manivannan
-Saikrishna Tadepalli
+Vipasha Gupta, Prasanna Thallapalli, Tracy Dong, Sineha Manivannan, Saikrishna Tadepalli
 
 ## Tasks completed for Sprint 1
 iClicker App:
