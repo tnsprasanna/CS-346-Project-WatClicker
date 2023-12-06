@@ -69,6 +69,13 @@ iClicker App:
 - Completed API for editing a student's selection
 - Fixed bugs and reamining features to be implemented from previous sprint
 
+## Tasks completed for Final submission
+- Added grades API 
+- Fixed bugs
+- Hosted backend
+- Added descriptive error and success messages for API
+- Fixed API for edit question such that existing student responses are not removed when answer changes
+
 ## Project Documents
 Project proposal: https://git.uwaterloo.ca/stadepal/cs346-proj/-/wikis/Project-Proposal
 
@@ -88,6 +95,8 @@ Release for Sprint 2: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sp
 Release for Sprint 3: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sprint3
 
 Relase for Sprint 4: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/Sprint4
+
+Release for Final submission: https://git.uwaterloo.ca/stadepal/cs346-proj/-/releases/finalSubmission
 
 ## Link to frontend repository
 https://git.uwaterloo.ca/v56gupta1/cs346-frontend
