@@ -30,12 +30,12 @@ fun Route.getQuestionById(
             call.respond(HttpStatusCode.BadRequest, "Unable to parse args!")
             return@get
         }
-
+        println("THIS IS BEING PRINTED 1");
         val question = questionDataSource.getQuestionById(request.questionId)?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest, "Question not found!")
             return@get
         }
-
+        println("THIS IS BEING PRINTED 2");
         val questionResponse = QuestionResponse(
             id = question.id.toString(),
             question = question.question,

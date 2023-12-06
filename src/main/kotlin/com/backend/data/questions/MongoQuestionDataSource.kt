@@ -21,7 +21,9 @@ class MongoQuestionDataSource(
     }
 
     override suspend fun getQuestionById(questionId: String): Question? {
+        println("1")
         val questionObjectId = getQuestionObjectId(questionId)?: return null
+        println("2")
         return questions.findOneById(questionObjectId)
     }
 
@@ -36,7 +38,6 @@ class MongoQuestionDataSource(
         oldQuestion.question = question;
         oldQuestion.options = options;
         oldQuestion.answer = answer;
-        oldQuestion.responses = MutableList(options.size) {0}
 
         // Update all Selection Models
         val selectionsList = selections.find(Selection::questionId eq questionObjectId).toList()
