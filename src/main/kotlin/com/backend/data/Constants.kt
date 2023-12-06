@@ -13,6 +13,11 @@ class Constants {
         fun generateCSVForList(colTitles: MutableList<String>, data: Map<String, MutableList<String>>): String {
             val csvStringBuilder = StringBuilder()
 
+            if (colTitles.size == 0) {
+                csvStringBuilder.appendLine("No Grades Available Yet,")
+                return csvStringBuilder.toString()
+            }
+
             for (colTitle in colTitles) {
                 csvStringBuilder.append("$colTitle, ")
             }
